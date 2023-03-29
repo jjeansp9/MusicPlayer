@@ -25,6 +25,10 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
+import com.google.android.gms.auth.api.signin.GoogleSignIn;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.kakao.sdk.auth.model.OAuthToken;
 import com.kakao.sdk.common.model.ClientError;
 import com.kakao.sdk.common.util.Utility;
@@ -98,13 +102,11 @@ public class MainActivity extends AppCompatActivity {
 
         Log.d("keyHash", " KeyHash :" + Utility.INSTANCE.getKeyHash(this)); // 카카오 SDK용 키해시 값
 
-        updateKakaoLogin();
-
         NaverIdLoginSDK.INSTANCE.initialize(this, ClientId, ClientSecret, "MusicPlayer");
 
-        if (NaverIdLoginSDK.INSTANCE.getAccessToken() != null) {
-            naverLogin();
-        }
+        updateKakaoLogin();
+        if (NaverIdLoginSDK.INSTANCE.getAccessToken() != null) naverLogin();
+
 
 
         // 카카오 로그인 관련
@@ -124,6 +126,7 @@ public class MainActivity extends AppCompatActivity {
         binding.googleLogout.setOnClickListener(v -> googleLogout()); // 구글 로그아웃 버튼
         binding.googleInfo.setOnClickListener(v -> googleInfo()); // 구글 정보 버튼
         binding.googleUnlink.setOnClickListener(v -> googleUnlink()); // 구글 회원탈퇴 버튼
+
     }
 
     // 카카오 로그인
@@ -382,9 +385,23 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
+        // TODO : https://console.cloud.google.com/welcome?project=placeappbykakaojspstudio API 콘솔에서 프로젝트 만들기
+        // TODO : https://developers.google.com/identity/sign-in/android/sign-in?hl=ko 구글 로그인 가이드문서
+    }
 
     // 구글 로그인
     private void googleLogin(){
+        GoogleSignInOptions gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+
+        GoogleSignInClient mGoogleSignInClient= GoogleSignIn.getClient(this, gso);
+
 
     }
 
