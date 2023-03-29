@@ -6,8 +6,10 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
+
+    <!--  카카오 로그인  -->
     <Button
-        android:id="@+id/login"
+        android:id="@+id/kakao_login"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="카카오 로그인"
@@ -18,23 +20,23 @@
 
 
     <Button
-        android:id="@+id/logout"
+        android:id="@+id/kakao_logout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="카카오 로그아웃"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/login"
+        android:layout_below="@id/kakao_login"
         android:textColor="@color/black"
         android:backgroundTint="#E8CA35"
         android:layout_marginTop="40dp"/>
 
     <Button
-        android:id="@+id/token_info"
+        android:id="@+id/kakao_token_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="카카오 토큰정보"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/logout"
+        android:layout_below="@id/kakao_logout"
         android:textColor="@color/black"
         android:backgroundTint="#E8CA35"
         android:layout_marginTop="40dp"/>
@@ -43,9 +45,9 @@
         android:id="@+id/kakao_image"
         android:layout_width="80dp"
         android:layout_height="80dp"
+        android:layout_below="@id/kakao_token_info"
         android:layout_alignParentLeft="true"
-        android:layout_below="@id/token_info"
-        android:layout_marginTop="40dp"/>
+        android:layout_marginTop="40dp" />
 
     <TextView
         android:id="@+id/kakao_name"
@@ -64,4 +66,135 @@
         android:textColor="@color/black"
         android:backgroundTint="#E8CA35"/>
 
+
+    <!--  네이버 로그인  -->
+
+    <Button
+        android:id="@+id/naver_login"
+        android:layout_width="140dp"
+        android:layout_height="48dp"
+        android:text="네이버 로그인"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:backgroundTint="#19C505"/>
+
+    <Button
+        android:id="@+id/naver_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:text="네이버 로그아웃"
+        android:layout_below="@id/naver_login"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="#19C505"/>
+
+    <Button
+        android:id="@+id/naver_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/naver_logout"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="#19C505"
+        android:text="네이버 회원정보" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/naver_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/naver_info"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="40dp" />
+    <TextView
+        android:id="@+id/naver_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_below="@id/naver_image"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/naver_unlink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:text="네이버 회원탈퇴"
+        android:backgroundTint="#66D804"/>
+
+
+
+    <!--  구글 로그인  -->
+
+    <Button
+        android:id="@+id/google_login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#D8D7D7"
+        android:textColor="@color/black"
+        android:text="구글 로그인"
+        android:layout_marginTop="30dp"
+        android:layout_alignParentRight="true"/>
+
+    <Button
+        android:id="@+id/google_logout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#D8D7D7"
+        android:textColor="@color/black"
+        android:text="구글 로그아웃"
+        android:layout_below="@id/google_login"
+        android:layout_marginTop="40dp"
+        android:layout_alignParentRight="true"/>
+
+    <Button
+        android:id="@+id/google_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/google_logout"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="40dp"
+        android:backgroundTint="#D8D7D7"
+        android:text="구글 정보"
+        android:textColor="@color/black" />
+
+    <de.hdodenhof.circleimageview.CircleImageView
+        android:id="@+id/google_image"
+        android:layout_width="80dp"
+        android:layout_height="80dp"
+        android:layout_below="@id/google_info"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="40dp" />
+    <TextView
+        android:id="@+id/google_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text=""
+        android:layout_below="@id/google_image"
+        android:layout_alignParentRight="true"/>
+
+    <Button
+        android:id="@+id/google_unlink"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#D8D7D7"
+        android:textColor="@color/black"
+        android:text="구글 회원탈퇴"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"/>
+
 </RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -2,8 +2,16 @@ package kr.co.musicplayer;
 
 import static android.content.ContentValues.TAG;
 
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultCallback;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContract;
+import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.os.UserManagerCompat;
 
 import android.content.Intent;
@@ -23,6 +31,11 @@ import com.kakao.sdk.common.util.Utility;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.AccessTokenInfo;
 import com.kakao.sdk.user.model.User;
+import com.navercorp.nid.NaverIdLoginSDK;
+import com.navercorp.nid.oauth.NidOAuthLogin;
+import com.navercorp.nid.oauth.OAuthLoginCallback;
+import com.navercorp.nid.profile.NidProfileCallback;
+import com.navercorp.nid.profile.data.NidProfileResponse;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -31,6 +44,7 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 import kr.co.musicplayer.databinding.ActivityMainBinding;
+import retrofit2.Response;
 
 // #############################
 
@@ -72,6 +86,10 @@ public class MainActivity extends AppCompatActivity {
 
     ActivityMainBinding binding;
 
+    private String ClientId= "RSc0aWDT5SRD1erXQkAt"; // 네이버 로그인 식별 아이디
+    private String ClientSecret= "UJFjvIuPXW"; // 네이버 로그인 식별 패스워드
+    NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -82,12 +100,30 @@ public class MainActivity extends AppCompatActivity {
 
         updateKakaoLogin();
 
-        // 카카오 로그인관련
-        binding.login.setOnClickListener(v -> kakaoLogin()); // 카카오 로그인 버튼
-        binding.logout.setOnClickListener(v -> kakaoLogout()); // 카카오 로그아웃 버튼
-        binding.tokenInfo.setOnClickListener(v -> kakaoTokenInfo()); // 카카오 토큰정보 버튼
+        NaverIdLoginSDK.INSTANCE.initialize(this, ClientId, ClientSecret, "MusicPlayer");
+
+        if (NaverIdLoginSDK.INSTANCE.getAccessToken() != null) {
+            naverLogin();
+        }
+
+
+        // 카카오 로그인 관련
+        binding.kakaoLogin.setOnClickListener(v -> kakaoLogin()); // 카카오 로그인 버튼
+        binding.kakaoLogout.setOnClickListener(v -> kakaoLogout()); // 카카오 로그아웃 버튼
+        binding.kakaoTokenInfo.setOnClickListener(v -> kakaoTokenInfo()); // 카카오 토큰정보 버튼
         binding.kakaoUnlink.setOnClickListener(v -> kakaoUnlink()); // 카카오 회원탈퇴 버튼
 
+        // 네이버 로그인 관련
+        binding.naverLogin.setOnClickListener(v -> naverLogin()); // 네이버 로그인 버튼
+        binding.naverLogout.setOnClickListener(v -> naverLogout()); // 네이버 로그아웃 버튼
+        binding.naverInfo.setOnClickListener(v -> naverInfo()); // 네이버 회원정보 버튼
+        binding.naverUnlink.setOnClickListener(v -> naverUnlink()); // 네이버 회원탈퇴 버튼
+
+        // 구글 로그인 관련
+        binding.googleLogin.setOnClickListener(v -> googleLogin()); // 구글 로그인 버튼
+        binding.googleLogout.setOnClickListener(v -> googleLogout()); // 구글 로그아웃 버튼
+        binding.googleInfo.setOnClickListener(v -> googleInfo()); // 구글 정보 버튼
+        binding.googleUnlink.setOnClickListener(v -> googleUnlink()); // 구글 회원탈퇴 버튼
     }
 
     // 카카오 로그인
@@ -100,6 +136,7 @@ public class MainActivity extends AppCompatActivity {
             public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
 
                 updateKakaoLogin();
+                Toast.makeText(MainActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
 
                 if (oAuthToken.getIdToken()!= null){
                     Log.d("token1", oAuthToken.getIdToken());
@@ -136,9 +173,6 @@ public class MainActivity extends AppCompatActivity {
 
                     Glide.with(MainActivity.this).load(user.getKakaoAccount().getProfile().getProfileImageUrl()).into(binding.kakaoImage);
                     binding.kakaoName.setText(user.getKakaoAccount().getProfile().getNickname());
-
-                }else{
-                    Log.e("kakaoLogin", "카카오계정으로 로그인 실패", throwable);
                 }
 
                 return null;
@@ -154,10 +188,12 @@ public class MainActivity extends AppCompatActivity {
 
                 if (throwable != null){
                     Log.e("kakaoLogout", "로그아웃 실패. SDK에서 토큰 삭제됨", throwable);
+                    Toast.makeText(MainActivity.this, "카카오 로그아웃 실패", Toast.LENGTH_SHORT).show();
                 }else{
                     Log.i("kakaoLogout", "로그아웃 성공. SDK에서 토큰 삭제됨");
                     Glide.with(MainActivity.this).load("").into(binding.kakaoImage);
                     binding.kakaoName.setText("");
+                    Toast.makeText(MainActivity.this, "카카오 로그아웃 성공", Toast.LENGTH_SHORT).show();
                 }
                 return null;
             }
@@ -174,6 +210,7 @@ public class MainActivity extends AppCompatActivity {
                 if (throwable != null){
                     Log.e("kakaoTokenInfo", "카카오 토큰 정보 보기 실패", throwable);
                     Toast.makeText(MainActivity.this, "카카오 토큰 정보 보기 실패", Toast.LENGTH_SHORT).show();
+
                 }else if(accessTokenInfo != null){
                     Log.i("kakaoTokenInfo", "카카오 토큰 정보 보기 성공" + "\n회원번호 : " + accessTokenInfo.getId() + "\n만료시간 : " + accessTokenInfo.getExpiresIn());
 
@@ -196,7 +233,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (throwable != null){
                     Log.e("kakaoUnlink", "카카오 회원탈퇴 실패", throwable);
-                    Toast.makeText(MainActivity.this, "회원탈퇴 실패", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
                 }else{
                     Log.i("kakaoUnlink", "카카오 회원탈퇴 성공");
                     Toast.makeText(MainActivity.this, "회원탈퇴 성공", Toast.LENGTH_SHORT).show();
@@ -210,6 +247,161 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
+//    NaverIdLoginSDK.initialize() 메서드가 여러 번 실행돼도
+//    기존에 저장된 접근 토큰(access token)과 갱신 토큰(refresh token)은 삭제되지 않습니다.
+
+//    기존에 저장된 접근 토큰과 갱신 토큰을 삭제하려면
+//    NaverIdLoginSDK.logout() 메서드나 NidOAuthLogin().callDeleteTokenApi() 메서드를 호출합니다.
+
+    // 네이버 로그인
+    private void naverLogin(){
+        NaverIdLoginSDK.INSTANCE.authenticate(this, launcher);
+    }
+
+    private ActivityResultLauncher<Intent> launcher= registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            switch (result.getResultCode()){
+                case RESULT_OK: {
+                    Log.i("naverLogin", "네이버 토큰 : " + NaverIdLoginSDK.INSTANCE.getAccessToken());
+                    Log.i("naverLogin", "네이버 Refresh토큰 : " + NaverIdLoginSDK.INSTANCE.getRefreshToken());
+                    Log.i("naverLogin", "네이버 만료시간 : " + NaverIdLoginSDK.INSTANCE.getExpiresAt());
+                    Log.i("naverLogin", "네이버 토큰타입 : " + NaverIdLoginSDK.INSTANCE.getTokenType());
+                    Log.i("naverLogin", "네이버 상태 : " + NaverIdLoginSDK.INSTANCE.getState());
+
+                    nidOAuthLogin.callProfileApi(new NidProfileCallback<NidProfileResponse>() {
+                        @Override
+                        public void onSuccess(NidProfileResponse nidProfileResponse) {
+
+                            Glide.with(MainActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
+                            binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
+                        }
+
+                        @Override
+                        public void onFailure(int i, @NonNull String s) {
+                        }
+
+                        @Override
+                        public void onError(int i, @NonNull String s) {
+                        }
+                    });
+
+                    Toast.makeText(MainActivity.this, "네이버 로그인 성공", Toast.LENGTH_SHORT).show();
+                }
+                case RESULT_CANCELED:{
+                    Log.e("naverError", "에러 : " + NaverIdLoginSDK.INSTANCE.getLastErrorCode().getCode() +", "+ NaverIdLoginSDK.INSTANCE.getLastErrorDescription());
+
+                }
+            }
+        }
+    });
+
+    private void naverLogout(){
+
+        if (NaverIdLoginSDK.INSTANCE.getAccessToken() == null){
+            Toast.makeText(this, "이미 로그아웃하였거나, 회원이 아닙니다", Toast.LENGTH_SHORT).show();
+        }else{
+            NaverIdLoginSDK.INSTANCE.logout();
+
+            Glide.with(MainActivity.this).load("").into(binding.naverImage);
+            binding.naverName.setText("");
+
+            Toast.makeText(this, "네이버 로그아웃 성공", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void naverInfo(){
+
+        nidOAuthLogin.callProfileApi(new NidProfileCallback<NidProfileResponse>() {
+            @Override
+            public void onSuccess(NidProfileResponse nidProfileResponse) {
+
+                Log.i("naverInfo", "네이버 ID : " + nidProfileResponse.getProfile().getId());
+                Log.i("naverInfo", "네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname());
+                Log.i("naverInfo", "네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage());
+                Log.i("naverInfo", "네이버 이메일 : " + nidProfileResponse.getProfile().getEmail());
+                Log.i("naverInfo", "네이버 성별 : " + nidProfileResponse.getProfile().getGender());
+                Log.i("naverInfo", "네이버 연령대 : " + nidProfileResponse.getProfile().getAge());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle("회원정보");
+                builder.setMessage(
+                        "네이버 ID : " + nidProfileResponse.getProfile().getId() + "\n"
+                                +"네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname() + "\n"
+                                +"네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage() + "\n"
+                                +"네이버 이메일 : " + nidProfileResponse.getProfile().getEmail() + "\n"
+                                +"네이버 성별 : " + nidProfileResponse.getProfile().getGender() + "\n"
+                                +"네이버 연령대 : " + nidProfileResponse.getProfile().getAge()
+                );
+                builder.show();
+
+                Glide.with(MainActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
+                binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
+            }
+
+            @Override
+            public void onFailure(int i, @NonNull String s) {
+                Toast.makeText(MainActivity.this, "로그인을 한 상태에서 확인이 가능합니다", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(int i, @NonNull String s) {
+                Toast.makeText(MainActivity.this, "onError", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+    private void naverUnlink(){
+
+        nidOAuthLogin.callDeleteTokenApi(this, new OAuthLoginCallback() {
+            @Override
+            public void onSuccess() {
+                //서버에서 토큰 삭제에 성공한 상태입니다.
+                Glide.with(MainActivity.this).load("").into(binding.naverImage);
+                binding.naverName.setText("");
+
+                Toast.makeText(MainActivity.this, "네이버 회원탈퇴 성공", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int i, @NonNull String s) {
+                // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
+                // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
+                Toast.makeText(MainActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onError(int i, @NonNull String s) {
+                // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
+                // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
+                Toast.makeText(MainActivity.this, "네이버 회원탈퇴 에러", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+
+    // 구글 로그인
+    private void googleLogin(){
+
+    }
+
+    // 구글 로그아웃
+    private void googleLogout(){
+
+    }
+
+    // 구글 정보
+    private void googleInfo(){
+
+    }
+
+    // 구글 회원탈퇴
+    private void googleUnlink(){
+
+    }
 
 }
 

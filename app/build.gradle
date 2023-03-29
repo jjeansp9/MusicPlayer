@@ -44,5 +44,8 @@ dependencies {
 
     // 소셜로그인
     implementation "com.kakao.sdk:v2-user:2.13.0" // 카카오 로그인
+    implementation 'com.navercorp.nid:oauth:5.4.0' // jdk 11 네이버 로그인
+    //implementation 'com.navercorp.nid:oauth-jdk8:5.4.0' // jdk 8 네이버 로그인
+    //implementation files('libs/oauth-5.4.0.aar') // 네이버로그인을 위해 project로 이동 후 libs폴더 안에 oauth-5.4.0.aar 파일 추가 후에 implement
 
 }
