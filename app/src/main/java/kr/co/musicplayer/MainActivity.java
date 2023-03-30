@@ -15,6 +15,7 @@ import androidx.core.app.ActivityOptionsCompat;
 import androidx.core.os.UserManagerCompat;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.content.pm.Signature;
@@ -29,6 +30,9 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.api.ApiException;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.kakao.sdk.auth.AuthApiClient;
 import com.kakao.sdk.auth.model.AccessTokenResponse;
 import com.kakao.sdk.auth.model.OAuthToken;
@@ -104,6 +108,11 @@ public class MainActivity extends AppCompatActivity {
 
     private UserApi userApi= ApiFactory.INSTANCE.getKapi().create(UserApi.class);
 
+    GoogleSignInClient mGoogleSignInClient;
+    private int RC_SIGN_IN = 10;
+
+    GoogleUser googleUser= new GoogleUser();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -118,8 +127,11 @@ public class MainActivity extends AppCompatActivity {
         kakaoUserInfo();
         kakaoUpdateToken();
 
-        naverInfo();
+        naverLogin();
         naverUpdateToken();
+
+        googleLogin();
+
 
         // 카카오 로그인 관련
         binding.kakaoLogin.setOnClickListener(v -> kakaoLogin()); // 카카오 로그인 버튼
@@ -130,6 +142,7 @@ public class MainActivity extends AppCompatActivity {
         // 네이버 로그인 관련
         binding.naverLogin.setOnClickListener(v -> naverLogin()); // 네이버 로그인 버튼
         binding.naverLogout.setOnClickListener(v -> naverLogout()); // 네이버 로그아웃 버튼
+        binding.naverInfo.setOnClickListener(v -> naverInfo());
         binding.naverUnlink.setOnClickListener(v -> naverUnlink()); // 네이버 회원탈퇴 버튼
 
         // 구글 로그인 관련
@@ -377,20 +390,18 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("naverInfo", "네이버 성별 : " + nidProfileResponse.getProfile().getGender());
                 Log.i("naverInfo", "네이버 연령대 : " + nidProfileResponse.getProfile().getAge());
 
-                binding.naverInfo.setOnClickListener(v -> { // 네이버 회원정보 버튼
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setCancelable(true);
-                    builder.setTitle("회원정보");
-                    builder.setMessage(
-                            "네이버 ID : " + nidProfileResponse.getProfile().getId() + "\n"
-                                    +"네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname() + "\n"
-                                    +"네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage() + "\n"
-                                    +"네이버 이메일 : " + nidProfileResponse.getProfile().getEmail() + "\n"
-                                    +"네이버 성별 : " + nidProfileResponse.getProfile().getGender() + "\n"
-                                    +"네이버 연령대 : " + nidProfileResponse.getProfile().getAge()
-                    );
-                    builder.show();
-                });
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle("회원정보");
+                builder.setMessage(
+                        "네이버 ID : " + nidProfileResponse.getProfile().getId() + "\n"
+                                +"네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname() + "\n"
+                                +"네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage() + "\n"
+                                +"네이버 이메일 : " + nidProfileResponse.getProfile().getEmail() + "\n"
+                                +"네이버 성별 : " + nidProfileResponse.getProfile().getGender() + "\n"
+                                +"네이버 연령대 : " + nidProfileResponse.getProfile().getAge()
+                );
+                builder.show();
 
                 Glide.with(MainActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
                 binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
@@ -449,28 +460,120 @@ public class MainActivity extends AppCompatActivity {
 
     // 구글 로그인
     private void googleLogin(){
+
         GoogleSignInOptions gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
                 .requestEmail()
                 .build();
 
-        GoogleSignInClient mGoogleSignInClient= GoogleSignIn.getClient(this, gso);
+        mGoogleSignInClient= GoogleSignIn.getClient(this, gso);
 
+        Intent signInIntent= mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == RC_SIGN_IN){
+            Task<GoogleSignInAccount> task= GoogleSignIn.getSignedInAccountFromIntent(data);
+            handleSignInResult(task);
+        }
+    }
+
+    private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
+        try {
+            GoogleSignInAccount account = completedTask.getResult(ApiException.class);
+
+            Log.i("googleID", account.getId());
+            Log.i("googleAccount", account.getAccount()+"");
+            Log.i("googleEmail", account.getEmail());
+            Log.i("googleDisplayName", account.getDisplayName());
+            Log.i("googleGivenName", account.getGivenName());
+            Log.i("googleFamilyName", account.getFamilyName());
+            Log.i("googlePhotoUrl", account.getPhotoUrl()+"");
+//            Log.i("googleLogin", account.getIdToken());
+
+            SharedPreferences pref = getSharedPreferences("google", MODE_PRIVATE);
+            SharedPreferences.Editor editor = pref.edit();
+
+            editor.putString("id", account.getId());
+            editor.putString("account", account.getAccount()+"");
+            editor.putString("email", account.getEmail());
+            editor.putString("displayName", account.getDisplayName());
+            editor.putString("photoUrl", account.getPhotoUrl()+"");
+            editor.commit();
+
+            googleUser.setAccount(account.getAccount()+"");
+            googleUser.setId(account.getId());
+            googleUser.setEmail(account.getEmail());
+            googleUser.setName(account.getDisplayName());
+            googleUser.setImage(account.getPhotoUrl()+"");
+
+            Glide.with(this).load(account.getPhotoUrl()).into(binding.googleImage);
+            binding.googleName.setText(account.getDisplayName());
+
+            Toast.makeText(MainActivity.this, "구글 로그인 완료", Toast.LENGTH_SHORT).show();
+
+            // Signed in successfully, show authenticated UI.
+            //updateUI(account);
+        } catch (ApiException e) {
+            // The ApiException status code indicates the detailed failure reason.
+            // Please refer to the GoogleSignInStatusCodes class reference for more information.
+            Log.w(TAG, "signInResult:failed code=" + e.getStatusCode());
+            //updateUI(null);
+        }
     }
 
     // 구글 로그아웃
     private void googleLogout(){
-
+        mGoogleSignInClient.signOut()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Glide.with(MainActivity.this).load("").into(binding.googleImage);
+                        binding.googleName.setText("");
+                        Toast.makeText(MainActivity.this, "구글 로그아웃 완료", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        googleUser.setAccount("");
+        googleUser.setId("");
+        googleUser.setEmail("");
+        googleUser.setName("");
+        googleUser.setImage("");
     }
 
-    // 구글 정보
     private void googleInfo(){
 
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        builder.setCancelable(true);
+        builder.setTitle("회원정보");
+        builder.setMessage(
+                "회원 계정 : " + googleUser.getAccount() + "\n"
+                        +"회원 아이디 : " + googleUser.getId() + "\n"
+                        + "회원 이메일 : " + googleUser.getEmail() + "\n"
+                        + "회원 이름 : " + googleUser.getName() + "\n"
+                        + "회원 사진 : " + googleUser.getImage());
+        builder.show();
     }
 
     // 구글 회원탈퇴
     private void googleUnlink(){
-
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Glide.with(MainActivity.this).load("").into(binding.googleImage);
+                        binding.googleName.setText("");
+                        Toast.makeText(MainActivity.this, "구글 회원탈퇴 완료", Toast.LENGTH_SHORT).show();
+                    }
+                });
+        googleUser.setAccount("");
+        googleUser.setId("");
+        googleUser.setEmail("");
+        googleUser.setName("");
+        googleUser.setImage("");
     }
 
 }

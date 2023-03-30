@@ -131,10 +131,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:backgroundTint="#D8D7D7"
-        android:textColor="@color/black"
+        android:layout_alignParentRight="true"
         android:text="구글 로그인"
         android:layout_marginTop="30dp"
-        android:layout_alignParentRight="true"/>
+        android:textColor="@color/black" />
 
     <Button
         android:id="@+id/google_logout"
