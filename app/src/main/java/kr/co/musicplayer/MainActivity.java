@@ -78,26 +78,6 @@ import retrofit2.Response;
 // 로그인 : 로그인요청 -> 인가코드 받기요청 -> 인증 및 동의요청 -> 로그인 및 동의 -> 인가코드 발급 -> 인가코드로 토큰발급요청 -> 토큰발급 -> 로그인완료, 토큰정보조회 및 검증
 
 
-// 1. 농우본수원갈비
-//     https://blog.naver.com/rolo_ggo/223034276486
-//     1인분 한우 75,000원 / 양념갈비  34.000원 평점 3.9
-//
-// 2. 횡성한우나주집
-//     https://blog.naver.com/kkoyang77/222465889389
-//     1인분 50,000원 ~ 60,000원 평점 3.5
-//
-// 3. 영통 하나참치
-//     https://m.blog.naver.com/gukjung/222524847432
-//     무한리필 1인당 27,000원~ 47,000원 평점 4.0
-//
-// 4. 양갈비(양자리)
-//     https://blog.naver.com/wonderful6688/222960106777
-//     1인분 23,000원~ 38,000원 평점 4.4
-//
-// 5. 영통 불꽃상회
-//     https://leesaram.tistory.com/147
-//     1인분 25,000원~ 40,000원 평점 4.1
-
 public class MainActivity extends AppCompatActivity {
 
     private ActivityMainBinding binding;
@@ -112,7 +92,6 @@ public class MainActivity extends AppCompatActivity {
     private int RC_SIGN_IN = 10;
 
     GoogleUser googleUser= new GoogleUser();
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -157,10 +136,7 @@ public class MainActivity extends AppCompatActivity {
     private void kakaoLogin(){
 
         // 카카오계정으로 로그인 공통 callback 구성
-        // 카카오톡으로 로그인 할 수 없어 카카오계정으로 로그인할 경우
-        Function2<OAuthToken, Throwable, Unit> callback= new Function2<OAuthToken, Throwable, Unit>() {
-            @Override
-            public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
+        Function2<OAuthToken, Throwable, Unit> callback= (oAuthToken, throwable) -> {
 
                 if (throwable != null){
                     Toast.makeText(MainActivity.this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show();
@@ -169,16 +145,14 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
                     Log.d("kakaoToken", oAuthToken.getAccessToken());
                 }
-
                 return null;
-            }
-        };
+            };
 
-        // 카카오톡이 휴대폰에 설치 되어있는지 확인
+        // 카카오톡이 휴대폰에 설치 되어있으면 카톡으로 바로 접근해서 로그인 [ 권장 ]
         if (UserApiClient.getInstance().isKakaoTalkLoginAvailable(this)){
             UserApiClient.getInstance().loginWithKakaoTalk(this, callback);
 
-        }else{ // 설치되어 있지 않은지 확인
+        }else{ // 설치되어 있지 않은 경우 카카오 사이트로 접속해서 로그인
             UserApiClient.getInstance().loginWithKakaoAccount(this, callback);
         }
     }
