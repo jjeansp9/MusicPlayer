@@ -29,9 +29,15 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.kakao.sdk.auth.AuthApiClient;
+import com.kakao.sdk.auth.model.AccessTokenResponse;
 import com.kakao.sdk.auth.model.OAuthToken;
 import com.kakao.sdk.common.model.ClientError;
+import com.kakao.sdk.common.model.KakaoSdkError;
 import com.kakao.sdk.common.util.Utility;
+import com.kakao.sdk.network.ApiCallback;
+import com.kakao.sdk.network.ApiFactory;
+import com.kakao.sdk.user.UserApi;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.AccessTokenInfo;
 import com.kakao.sdk.user.model.User;
@@ -48,6 +54,8 @@ import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 import kr.co.musicplayer.databinding.ActivityMainBinding;
+import retrofit2.Call;
+import retrofit2.Callback;
 import retrofit2.Response;
 
 // #############################
@@ -88,11 +96,14 @@ import retrofit2.Response;
 
 public class MainActivity extends AppCompatActivity {
 
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
 
     private String ClientId= "RSc0aWDT5SRD1erXQkAt"; // 네이버 로그인 식별 아이디
     private String ClientSecret= "UJFjvIuPXW"; // 네이버 로그인 식별 패스워드
-    NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
+    private NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
+
+    private UserApi userApi= ApiFactory.INSTANCE.getKapi().create(UserApi.class);
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -104,10 +115,11 @@ public class MainActivity extends AppCompatActivity {
 
         NaverIdLoginSDK.INSTANCE.initialize(this, ClientId, ClientSecret, "MusicPlayer");
 
-        updateKakaoLogin();
-        if (NaverIdLoginSDK.INSTANCE.getAccessToken() != null) naverLogin();
+        kakaoUserInfo();
+        kakaoUpdateToken();
 
-
+        naverInfo();
+        naverUpdateToken();
 
         // 카카오 로그인 관련
         binding.kakaoLogin.setOnClickListener(v -> kakaoLogin()); // 카카오 로그인 버튼
@@ -118,7 +130,6 @@ public class MainActivity extends AppCompatActivity {
         // 네이버 로그인 관련
         binding.naverLogin.setOnClickListener(v -> naverLogin()); // 네이버 로그인 버튼
         binding.naverLogout.setOnClickListener(v -> naverLogout()); // 네이버 로그아웃 버튼
-        binding.naverInfo.setOnClickListener(v -> naverInfo()); // 네이버 회원정보 버튼
         binding.naverUnlink.setOnClickListener(v -> naverUnlink()); // 네이버 회원탈퇴 버튼
 
         // 구글 로그인 관련
@@ -138,14 +149,14 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public Unit invoke(OAuthToken oAuthToken, Throwable throwable) {
 
-                updateKakaoLogin();
-                Toast.makeText(MainActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
-
-                if (oAuthToken.getIdToken()!= null){
-                    Log.d("token1", oAuthToken.getIdToken());
-                }else if(oAuthToken.getAccessToken()!=null){
-                    Log.d("token2", oAuthToken.getAccessToken());
+                if (throwable != null){
+                    Toast.makeText(MainActivity.this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show();
+                }else{
+                    kakaoUserInfo();
+                    Toast.makeText(MainActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
+                    Log.d("kakaoToken", oAuthToken.getAccessToken());
                 }
+
                 return null;
             }
         };
@@ -159,8 +170,8 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    private void updateKakaoLogin(){
+    // 카카오 회원 정보
+    private void kakaoUserInfo(){
 
         UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
             @Override
@@ -191,7 +202,7 @@ public class MainActivity extends AppCompatActivity {
 
                 if (throwable != null){
                     Log.e("kakaoLogout", "로그아웃 실패. SDK에서 토큰 삭제됨", throwable);
-                    Toast.makeText(MainActivity.this, "카카오 로그아웃 실패", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(MainActivity.this, "이미 로그아웃하였거나, 로그인을 하지 않았습니다.", Toast.LENGTH_SHORT).show();
                 }else{
                     Log.i("kakaoLogout", "로그아웃 성공. SDK에서 토큰 삭제됨");
                     Glide.with(MainActivity.this).load("").into(binding.kakaoImage);
@@ -206,26 +217,43 @@ public class MainActivity extends AppCompatActivity {
 
     // 카카오 회원 식별을 위한 토큰정보, 만료시간
     private void kakaoTokenInfo(){
-        UserApiClient.getInstance().accessTokenInfo(new Function2<AccessTokenInfo, Throwable, Unit>() {
-            @Override
-            public Unit invoke(AccessTokenInfo accessTokenInfo, Throwable throwable) {
 
-                if (throwable != null){
-                    Log.e("kakaoTokenInfo", "카카오 토큰 정보 보기 실패", throwable);
-                    Toast.makeText(MainActivity.this, "카카오 토큰 정보 보기 실패", Toast.LENGTH_SHORT).show();
+        UserApiClient.getInstance().accessTokenInfo((accessTokenInfo, throwable) -> {
 
-                }else if(accessTokenInfo != null){
-                    Log.i("kakaoTokenInfo", "카카오 토큰 정보 보기 성공" + "\n회원번호 : " + accessTokenInfo.getId() + "\n만료시간 : " + accessTokenInfo.getExpiresIn());
+            if (throwable != null){
+                Log.e("kakaoTokenInfo", "카카오 토큰 정보 보기 실패", throwable);
+                Toast.makeText(MainActivity.this, "카카오 토큰 정보 보기 실패", Toast.LENGTH_SHORT).show();
 
-                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                    builder.setCancelable(true);
-                    builder.setTitle("회원식별을 위한 토큰정보, 만료시간");
-                    builder.setMessage("회원번호 : " + accessTokenInfo.getId() + "\n" +"만료시간 : " + accessTokenInfo.getExpiresIn()+"초");
-                    builder.show();
-                }
-                return null;
+            }else if(accessTokenInfo != null){
+                Log.i("kakaoTokenInfo", "카카오 토큰 정보 보기 성공" + "\n회원번호 : " + accessTokenInfo.getId() + "\n만료시간 : " + accessTokenInfo.getExpiresIn());
+
+                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                builder.setCancelable(true);
+                builder.setTitle("회원식별을 위한 토큰정보, 만료시간");
+                builder.setMessage("회원번호 : " + accessTokenInfo.getId() + "\n" +"만료시간 : " + accessTokenInfo.getExpiresIn()+"초");
+                builder.show();
             }
+            return null;
+
         });
+    }
+
+    // 카카오 토큰 갱신
+    private void kakaoUpdateToken(){
+
+        userApi.accessTokenInfo()
+                .enqueue(new ApiCallback<AccessTokenInfo>() {
+                    @Override
+                    public void onComplete(@Nullable AccessTokenInfo model, @Nullable Throwable throwable) {
+                        callback(model, throwable);
+                        Log.i("kakaoTokenUpdate", model+"," + throwable);
+                    }
+                });
+    }
+
+    private Unit callback(AccessTokenInfo tokenInfo, Throwable error){
+
+        return null;
     }
 
     // 카카오 회원탈퇴
@@ -259,6 +287,7 @@ public class MainActivity extends AppCompatActivity {
     // 네이버 로그인
     private void naverLogin(){
         NaverIdLoginSDK.INSTANCE.authenticate(this, launcher);
+
     }
 
     private ActivityResultLauncher<Intent> launcher= registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
@@ -299,10 +328,11 @@ public class MainActivity extends AppCompatActivity {
         }
     });
 
+    // 네이버 로그아웃
     private void naverLogout(){
 
         if (NaverIdLoginSDK.INSTANCE.getAccessToken() == null){
-            Toast.makeText(this, "이미 로그아웃하였거나, 회원이 아닙니다", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "이미 로그아웃하였거나, 로그인을 하지 않았습니다.", Toast.LENGTH_SHORT).show();
         }else{
             NaverIdLoginSDK.INSTANCE.logout();
 
@@ -313,6 +343,27 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    // 네이버 토큰 만료되면 갱신 [ 만료시간 1시간이며 만료될 때마다 토큰 재발급받음 ]
+    private void naverUpdateToken(){
+        nidOAuthLogin.callRefreshAccessTokenApi(this, new OAuthLoginCallback() {
+            @Override
+            public void onSuccess() {
+                NaverIdLoginSDK.INSTANCE.getAccessToken(); // 토큰 재발급
+            }
+
+            @Override
+            public void onFailure(int i, @NonNull String s) {
+
+            }
+
+            @Override
+            public void onError(int i, @NonNull String s) {
+
+            }
+        });
+    }
+
+    // 네이버 회원정보
     private void naverInfo(){
 
         nidOAuthLogin.callProfileApi(new NidProfileCallback<NidProfileResponse>() {
@@ -326,18 +377,20 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("naverInfo", "네이버 성별 : " + nidProfileResponse.getProfile().getGender());
                 Log.i("naverInfo", "네이버 연령대 : " + nidProfileResponse.getProfile().getAge());
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
-                builder.setCancelable(true);
-                builder.setTitle("회원정보");
-                builder.setMessage(
-                        "네이버 ID : " + nidProfileResponse.getProfile().getId() + "\n"
-                                +"네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname() + "\n"
-                                +"네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage() + "\n"
-                                +"네이버 이메일 : " + nidProfileResponse.getProfile().getEmail() + "\n"
-                                +"네이버 성별 : " + nidProfileResponse.getProfile().getGender() + "\n"
-                                +"네이버 연령대 : " + nidProfileResponse.getProfile().getAge()
-                );
-                builder.show();
+                binding.naverInfo.setOnClickListener(v -> { // 네이버 회원정보 버튼
+                    AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                    builder.setCancelable(true);
+                    builder.setTitle("회원정보");
+                    builder.setMessage(
+                            "네이버 ID : " + nidProfileResponse.getProfile().getId() + "\n"
+                                    +"네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname() + "\n"
+                                    +"네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage() + "\n"
+                                    +"네이버 이메일 : " + nidProfileResponse.getProfile().getEmail() + "\n"
+                                    +"네이버 성별 : " + nidProfileResponse.getProfile().getGender() + "\n"
+                                    +"네이버 연령대 : " + nidProfileResponse.getProfile().getAge()
+                    );
+                    builder.show();
+                });
 
                 Glide.with(MainActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
                 binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
@@ -354,8 +407,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        Log.i("tokenTime", NaverIdLoginSDK.INSTANCE.getExpiresAt()+"");
     }
 
+    // 네이버 회원탈퇴
     private void naverUnlink(){
 
         nidOAuthLogin.callDeleteTokenApi(this, new OAuthLoginCallback() {
@@ -390,8 +445,6 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         GoogleSignInAccount account = GoogleSignIn.getLastSignedInAccount(this);
-        // TODO : https://console.cloud.google.com/welcome?project=placeappbykakaojspstudio API 콘솔에서 프로젝트 만들기
-        // TODO : https://developers.google.com/identity/sign-in/android/sign-in?hl=ko 구글 로그인 가이드문서
     }
 
     // 구글 로그인

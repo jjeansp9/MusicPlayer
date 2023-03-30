@@ -60,11 +60,11 @@
         android:id="@+id/kakao_unlink"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="회원탈퇴"
         android:layout_alignParentLeft="true"
         android:layout_alignParentBottom="true"
-        android:textColor="@color/black"
-        android:backgroundTint="#E8CA35"/>
+        android:backgroundTint="#E8CA35"
+        android:text="카카오 회원탈퇴"
+        android:textColor="@color/black" />
 
 
     <!--  네이버 로그인  -->
@@ -119,8 +119,8 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:text="네이버 회원탈퇴"
-        android:backgroundTint="#66D804"/>
+        android:backgroundTint="#66D804"
+        android:text="네이버 회원탈퇴" />
 
 
 
