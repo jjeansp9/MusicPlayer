@@ -1,4 +1,4 @@
-package kr.co.musicplayer;
+package kr.co.musicplayer.model;
 
 public class GoogleUser {
 
