@@ -1,28 +1,11 @@
 package kr.co.musicplayer;
 
-import com.google.gson.annotations.Expose;
-import com.google.gson.annotations.SerializedName;
-
 public class GoogleUser {
 
-    @SerializedName("account")
-    @Expose
     private String account;
-
-    @SerializedName("id")
-    @Expose
     private String id;
-
-    @SerializedName("email")
-    @Expose
     private String email;
-
-    @SerializedName("name")
-    @Expose
     private String name;
-
-    @SerializedName("image")
-    @Expose
     private String image;
 
     public String getAccount() {return account;}

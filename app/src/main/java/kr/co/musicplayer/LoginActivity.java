@@ -5,23 +5,15 @@ import static android.content.ContentValues.TAG;
 import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.ActivityOptionsCompat;
-import androidx.core.os.UserManagerCompat;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
-import android.content.pm.Signature;
 import android.os.Bundle;
-import android.os.UserManager;
-import android.util.Base64;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -33,11 +25,7 @@ import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.kakao.sdk.auth.AuthApiClient;
-import com.kakao.sdk.auth.model.AccessTokenResponse;
 import com.kakao.sdk.auth.model.OAuthToken;
-import com.kakao.sdk.common.model.ClientError;
-import com.kakao.sdk.common.model.KakaoSdkError;
 import com.kakao.sdk.common.util.Utility;
 import com.kakao.sdk.network.ApiCallback;
 import com.kakao.sdk.network.ApiFactory;
@@ -51,16 +39,10 @@ import com.navercorp.nid.oauth.OAuthLoginCallback;
 import com.navercorp.nid.profile.NidProfileCallback;
 import com.navercorp.nid.profile.data.NidProfileResponse;
 
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
-
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
-import kr.co.musicplayer.databinding.ActivityMainBinding;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import kr.co.musicplayer.databinding.ActivityLoginBinding;
 
 // #############################
 
@@ -72,15 +54,14 @@ import retrofit2.Response;
 // Refresh token - 액세스 토큰 재발급에 사용. 매번 카카오계정 정보를 입력하거나 소셜로그인하는 인증절차를 거치지않아도 재발급 가능 [ 만료시간 : 2달이며, 1달남은 시점부터 갱신가능 ]
 // ID token - 카카오 로그인 사용자의 인증정보를 제공하는 토큰 [ 만료시간 : Access token과 동일 ]
 
-
 // 로그인 과정 단계
 
 // 로그인 : 로그인요청 -> 인가코드 받기요청 -> 인증 및 동의요청 -> 로그인 및 동의 -> 인가코드 발급 -> 인가코드로 토큰발급요청 -> 토큰발급 -> 로그인완료, 토큰정보조회 및 검증
 
 
-public class MainActivity extends AppCompatActivity {
+public class LoginActivity extends AppCompatActivity {
 
-    private ActivityMainBinding binding;
+    private ActivityLoginBinding binding;
 
     private String ClientId= "RSc0aWDT5SRD1erXQkAt"; // 네이버 로그인 식별 아이디
     private String ClientSecret= "UJFjvIuPXW"; // 네이버 로그인 식별 패스워드
@@ -96,7 +77,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding= ActivityMainBinding.inflate(getLayoutInflater());
+        binding= ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         Log.d("keyHash", " KeyHash :" + Utility.INSTANCE.getKeyHash(this)); // 카카오 SDK용 키해시 값
@@ -139,10 +120,10 @@ public class MainActivity extends AppCompatActivity {
         Function2<OAuthToken, Throwable, Unit> callback= (oAuthToken, throwable) -> {
 
                 if (throwable != null){
-                    Toast.makeText(MainActivity.this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show();
                 }else{
                     kakaoUserInfo();
-                    Toast.makeText(MainActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
                     Log.d("kakaoToken", oAuthToken.getAccessToken());
                 }
                 return null;
@@ -172,7 +153,7 @@ public class MainActivity extends AppCompatActivity {
                     Log.i("kakaoLogin", "카카오 연령대 : " + user.getKakaoAccount().getAgeRange());
                     Log.i("kakaoLogin", "카카오 프로필사진 : " + user.getKakaoAccount().getProfile().getProfileImageUrl());
 
-                    Glide.with(MainActivity.this).load(user.getKakaoAccount().getProfile().getProfileImageUrl()).into(binding.kakaoImage);
+                    Glide.with(LoginActivity.this).load(user.getKakaoAccount().getProfile().getProfileImageUrl()).into(binding.kakaoImage);
                     binding.kakaoName.setText(user.getKakaoAccount().getProfile().getNickname());
                 }
 
@@ -189,12 +170,12 @@ public class MainActivity extends AppCompatActivity {
 
                 if (throwable != null){
                     Log.e("kakaoLogout", "로그아웃 실패. SDK에서 토큰 삭제됨", throwable);
-                    Toast.makeText(MainActivity.this, "이미 로그아웃하였거나, 로그인을 하지 않았습니다.", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "이미 로그아웃하였거나, 로그인을 하지 않았습니다.", Toast.LENGTH_SHORT).show();
                 }else{
                     Log.i("kakaoLogout", "로그아웃 성공. SDK에서 토큰 삭제됨");
-                    Glide.with(MainActivity.this).load("").into(binding.kakaoImage);
+                    Glide.with(LoginActivity.this).load("").into(binding.kakaoImage);
                     binding.kakaoName.setText("");
-                    Toast.makeText(MainActivity.this, "카카오 로그아웃 성공", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "카카오 로그아웃 성공", Toast.LENGTH_SHORT).show();
                 }
                 return null;
             }
@@ -209,12 +190,12 @@ public class MainActivity extends AppCompatActivity {
 
             if (throwable != null){
                 Log.e("kakaoTokenInfo", "카카오 토큰 정보 보기 실패", throwable);
-                Toast.makeText(MainActivity.this, "카카오 토큰 정보 보기 실패", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "카카오 토큰 정보 보기 실패", Toast.LENGTH_SHORT).show();
 
             }else if(accessTokenInfo != null){
                 Log.i("kakaoTokenInfo", "카카오 토큰 정보 보기 성공" + "\n회원번호 : " + accessTokenInfo.getId() + "\n만료시간 : " + accessTokenInfo.getExpiresIn());
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                 builder.setCancelable(true);
                 builder.setTitle("회원식별을 위한 토큰정보, 만료시간");
                 builder.setMessage("회원번호 : " + accessTokenInfo.getId() + "\n" +"만료시간 : " + accessTokenInfo.getExpiresIn()+"초");
@@ -251,11 +232,11 @@ public class MainActivity extends AppCompatActivity {
 
                 if (throwable != null){
                     Log.e("kakaoUnlink", "카카오 회원탈퇴 실패", throwable);
-                    Toast.makeText(MainActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(LoginActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
                 }else{
                     Log.i("kakaoUnlink", "카카오 회원탈퇴 성공");
-                    Toast.makeText(MainActivity.this, "회원탈퇴 성공", Toast.LENGTH_SHORT).show();
-                    Glide.with(MainActivity.this).load("").into(binding.kakaoImage);
+                    Toast.makeText(LoginActivity.this, "회원탈퇴 성공", Toast.LENGTH_SHORT).show();
+                    Glide.with(LoginActivity.this).load("").into(binding.kakaoImage);
                     binding.kakaoName.setText("");
                 }
 
@@ -292,9 +273,9 @@ public class MainActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(NidProfileResponse nidProfileResponse) {
 
-                            Glide.with(MainActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
+                            Glide.with(LoginActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
                             binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
-                            Toast.makeText(MainActivity.this, "네이버 로그인 성공", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(LoginActivity.this, "네이버 로그인 성공", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -323,7 +304,7 @@ public class MainActivity extends AppCompatActivity {
         }else{
             NaverIdLoginSDK.INSTANCE.logout();
 
-            Glide.with(MainActivity.this).load("").into(binding.naverImage);
+            Glide.with(LoginActivity.this).load("").into(binding.naverImage);
             binding.naverName.setText("");
 
             Toast.makeText(this, "네이버 로그아웃 성공", Toast.LENGTH_SHORT).show();
@@ -364,7 +345,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.i("naverInfo", "네이버 성별 : " + nidProfileResponse.getProfile().getGender());
                 Log.i("naverInfo", "네이버 연령대 : " + nidProfileResponse.getProfile().getAge());
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
                 builder.setCancelable(true);
                 builder.setTitle("회원정보");
                 builder.setMessage(
@@ -377,18 +358,18 @@ public class MainActivity extends AppCompatActivity {
                 );
                 builder.show();
 
-                Glide.with(MainActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
+                Glide.with(LoginActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
                 binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
             }
 
             @Override
             public void onFailure(int i, @NonNull String s) {
-                Toast.makeText(MainActivity.this, "로그인을 한 상태에서 확인이 가능합니다", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "로그인을 한 상태에서 확인이 가능합니다", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onError(int i, @NonNull String s) {
-                Toast.makeText(MainActivity.this, "onError", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "onError", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -402,17 +383,17 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onSuccess() {
                 //서버에서 토큰 삭제에 성공한 상태입니다.
-                Glide.with(MainActivity.this).load("").into(binding.naverImage);
+                Glide.with(LoginActivity.this).load("").into(binding.naverImage);
                 binding.naverName.setText("");
 
-                Toast.makeText(MainActivity.this, "네이버 회원탈퇴 성공", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "네이버 회원탈퇴 성공", Toast.LENGTH_SHORT).show();
             }
 
             @Override
             public void onFailure(int i, @NonNull String s) {
                 // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
                 // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
-                Toast.makeText(MainActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
 
             }
 
@@ -420,7 +401,7 @@ public class MainActivity extends AppCompatActivity {
             public void onError(int i, @NonNull String s) {
                 // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
                 // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
-                Toast.makeText(MainActivity.this, "네이버 회원탈퇴 에러", Toast.LENGTH_SHORT).show();
+                Toast.makeText(LoginActivity.this, "네이버 회원탈퇴 에러", Toast.LENGTH_SHORT).show();
             }
         });
     }
@@ -487,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
             Glide.with(this).load(account.getPhotoUrl()).into(binding.googleImage);
             binding.googleName.setText(account.getDisplayName());
 
-            Toast.makeText(MainActivity.this, "구글 로그인 완료", Toast.LENGTH_SHORT).show();
+            Toast.makeText(LoginActivity.this, "구글 로그인 완료", Toast.LENGTH_SHORT).show();
 
             // Signed in successfully, show authenticated UI.
             //updateUI(account);
@@ -505,9 +486,9 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        Glide.with(MainActivity.this).load("").into(binding.googleImage);
+                        Glide.with(LoginActivity.this).load("").into(binding.googleImage);
                         binding.googleName.setText("");
-                        Toast.makeText(MainActivity.this, "구글 로그아웃 완료", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "구글 로그아웃 완료", Toast.LENGTH_SHORT).show();
                     }
                 });
         googleUser.setAccount("");
@@ -520,7 +501,7 @@ public class MainActivity extends AppCompatActivity {
     private void googleInfo(){
 
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(LoginActivity.this);
         builder.setCancelable(true);
         builder.setTitle("회원정보");
         builder.setMessage(
@@ -538,9 +519,9 @@ public class MainActivity extends AppCompatActivity {
                 .addOnCompleteListener(this, new OnCompleteListener<Void>() {
                     @Override
                     public void onComplete(@NonNull Task<Void> task) {
-                        Glide.with(MainActivity.this).load("").into(binding.googleImage);
+                        Glide.with(LoginActivity.this).load("").into(binding.googleImage);
                         binding.googleName.setText("");
-                        Toast.makeText(MainActivity.this, "구글 회원탈퇴 완료", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(LoginActivity.this, "구글 회원탈퇴 완료", Toast.LENGTH_SHORT).show();
                     }
                 });
         googleUser.setAccount("");
