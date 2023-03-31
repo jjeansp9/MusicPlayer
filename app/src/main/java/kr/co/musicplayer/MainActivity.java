@@ -294,6 +294,7 @@ public class MainActivity extends AppCompatActivity {
 
                             Glide.with(MainActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
                             binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
+                            Toast.makeText(MainActivity.this, "네이버 로그인 성공", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -305,7 +306,6 @@ public class MainActivity extends AppCompatActivity {
                         }
                     });
 
-                    Toast.makeText(MainActivity.this, "네이버 로그인 성공", Toast.LENGTH_SHORT).show();
                 }
                 case RESULT_CANCELED:{
                     Log.e("naverError", "에러 : " + NaverIdLoginSDK.INSTANCE.getLastErrorCode().getCode() +", "+ NaverIdLoginSDK.INSTANCE.getLastErrorDescription());
