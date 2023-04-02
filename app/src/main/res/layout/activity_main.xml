@@ -51,10 +51,10 @@
     <ImageView
         android:layout_width="50dp"
         android:layout_height="50dp"
-        android:src="@drawable/ic_baseline_fast_rewind_24"
         android:layout_below="@id/seek_bar"
+        android:layout_marginRight="50dp"
         android:layout_toLeftOf="@id/play"
-        android:layout_marginRight="50dp"/>
+        android:src="@drawable/ic_baseline_fast_rewind_24" />
 
     <ImageView
         android:layout_width="50dp"
