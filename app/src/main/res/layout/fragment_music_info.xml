@@ -3,11 +3,46 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <TextView
+    <ImageView
+        android:id="@+id/music_image"
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:src="@drawable/ic_baseline_image_24"
+        android:layout_margin="16dp"
+        />
+
+    <RelativeLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="music info"
-        android:textSize="24sp"
-        android:layout_centerInParent="true"/>
+        android:layout_below="@id/music_image"
+        android:layout_margin="16dp">
+
+        <TextView
+            android:id="@+id/music_composer"
+            android:layout_width="130dp"
+            android:layout_height="wrap_content"
+            android:text="작곡가"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:textStyle="bold"/>
+
+        <TextView
+            android:id="@+id/music_title"
+            android:layout_width="210dp"
+            android:layout_height="wrap_content"
+            android:text="음악 제목"
+            android:gravity="right"
+            android:layout_alignParentRight="true"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:textSize="20sp"/>
+
+    </RelativeLayout>
+
+
 
 </RelativeLayout>
