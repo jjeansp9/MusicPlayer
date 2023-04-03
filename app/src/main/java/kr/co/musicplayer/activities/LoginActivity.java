@@ -11,12 +11,10 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -30,18 +28,15 @@ import com.kakao.sdk.network.ApiFactory;
 import com.kakao.sdk.user.UserApi;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.AccessTokenInfo;
-import com.kakao.sdk.user.model.User;
 import com.navercorp.nid.NaverIdLoginSDK;
 import com.navercorp.nid.oauth.NidOAuthLogin;
-import com.navercorp.nid.oauth.OAuthLoginCallback;
 import com.navercorp.nid.profile.NidProfileCallback;
 import com.navercorp.nid.profile.data.NidProfileResponse;
 
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
-import kr.co.musicplayer.R;
 import kr.co.musicplayer.databinding.ActivityLoginBinding;
-import kr.co.musicplayer.model.GoogleUser;
+import kr.co.musicplayer.model.User;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -56,7 +51,7 @@ public class LoginActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     private int RC_SIGN_IN = 10;
 
-    GoogleUser googleUser= new GoogleUser();
+    User user=new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -106,9 +101,9 @@ public class LoginActivity extends AppCompatActivity {
 
     // 카카오 회원 정보
     private void kakaoUserInfo(){
-        UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
+        UserApiClient.getInstance().me(new Function2<com.kakao.sdk.user.model.User, Throwable, Unit>() {
             @Override
-            public Unit invoke(User user, Throwable throwable) {
+            public Unit invoke(com.kakao.sdk.user.model.User user, Throwable throwable) {
 
                 if (user != null) {
                     Log.i("kakaoLogin", "카카오 고유ID : " + user.getId());
@@ -226,11 +221,7 @@ public class LoginActivity extends AppCompatActivity {
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
 
-            googleUser.setAccount(account.getAccount()+"");
-            googleUser.setId(account.getId());
-            googleUser.setEmail(account.getEmail());
-            googleUser.setName(account.getDisplayName());
-            googleUser.setImage(account.getPhotoUrl()+"");
+
 
 //            Glide.with(this).load(account.getPhotoUrl()).into(binding.googleImage);
 //            binding.googleName.setText(account.getDisplayName());

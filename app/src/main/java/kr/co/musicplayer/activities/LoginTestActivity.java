@@ -12,7 +12,6 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
@@ -32,7 +31,6 @@ import com.kakao.sdk.network.ApiFactory;
 import com.kakao.sdk.user.UserApi;
 import com.kakao.sdk.user.UserApiClient;
 import com.kakao.sdk.user.model.AccessTokenInfo;
-import com.kakao.sdk.user.model.User;
 import com.navercorp.nid.NaverIdLoginSDK;
 import com.navercorp.nid.oauth.NidOAuthLogin;
 import com.navercorp.nid.oauth.OAuthLoginCallback;
@@ -42,7 +40,7 @@ import com.navercorp.nid.profile.data.NidProfileResponse;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
-import kr.co.musicplayer.model.GoogleUser;
+import kr.co.musicplayer.model.User;
 import kr.co.musicplayer.databinding.ActivityLoginTestBinding;
 
 
@@ -73,7 +71,7 @@ public class LoginTestActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     private int RC_SIGN_IN = 10;
 
-    GoogleUser googleUser= new GoogleUser();
+    User user= new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -142,9 +140,9 @@ public class LoginTestActivity extends AppCompatActivity {
     // 카카오 회원 정보
     private void kakaoUserInfo(){
 
-        UserApiClient.getInstance().me(new Function2<User, Throwable, Unit>() {
+        UserApiClient.getInstance().me(new Function2<com.kakao.sdk.user.model.User, Throwable, Unit>() {
             @Override
-            public Unit invoke(User user, Throwable throwable) {
+            public Unit invoke(com.kakao.sdk.user.model.User user, Throwable throwable) {
 
                 if (user != null) {
                     Log.i("kakaoLogin", "카카오 고유ID : " + user.getId());
@@ -450,11 +448,11 @@ public class LoginTestActivity extends AppCompatActivity {
             Log.i("googlePhotoUrl", account.getPhotoUrl()+"");
 //            Log.i("googleLogin", account.getIdToken());
 
-            googleUser.setAccount(account.getAccount()+"");
-            googleUser.setId(account.getId());
-            googleUser.setEmail(account.getEmail());
-            googleUser.setName(account.getDisplayName());
-            googleUser.setImage(account.getPhotoUrl()+"");
+            user.setAccount(account.getAccount()+"");
+            user.setId(account.getId());
+            user.setEmail(account.getEmail());
+            user.setName(account.getDisplayName());
+            user.setImage(account.getPhotoUrl()+"");
 
             Glide.with(this).load(account.getPhotoUrl()).into(binding.googleImage);
             binding.googleName.setText(account.getDisplayName());
@@ -482,11 +480,11 @@ public class LoginTestActivity extends AppCompatActivity {
                         Toast.makeText(LoginTestActivity.this, "구글 로그아웃 완료", Toast.LENGTH_SHORT).show();
                     }
                 });
-        googleUser.setAccount("");
-        googleUser.setId("");
-        googleUser.setEmail("");
-        googleUser.setName("");
-        googleUser.setImage("");
+        user.setAccount("");
+        user.setId("");
+        user.setEmail("");
+        user.setName("");
+        user.setImage("");
     }
 
     private void googleInfo(){
@@ -496,11 +494,11 @@ public class LoginTestActivity extends AppCompatActivity {
         builder.setCancelable(true);
         builder.setTitle("회원정보");
         builder.setMessage(
-                "회원 계정 : " + googleUser.getAccount() + "\n"
-                        +"회원 아이디 : " + googleUser.getId() + "\n"
-                        + "회원 이메일 : " + googleUser.getEmail() + "\n"
-                        + "회원 이름 : " + googleUser.getName() + "\n"
-                        + "회원 사진 : " + googleUser.getImage());
+                "회원 계정 : " + user.getAccount() + "\n"
+                        +"회원 아이디 : " + user.getId() + "\n"
+                        + "회원 이메일 : " + user.getEmail() + "\n"
+                        + "회원 이름 : " + user.getName() + "\n"
+                        + "회원 사진 : " + user.getImage());
         builder.show();
     }
 
@@ -515,11 +513,11 @@ public class LoginTestActivity extends AppCompatActivity {
                         Toast.makeText(LoginTestActivity.this, "구글 회원탈퇴 완료", Toast.LENGTH_SHORT).show();
                     }
                 });
-        googleUser.setAccount("");
-        googleUser.setId("");
-        googleUser.setEmail("");
-        googleUser.setName("");
-        googleUser.setImage("");
+        user.setAccount("");
+        user.setId("");
+        user.setEmail("");
+        user.setName("");
+        user.setImage("");
     }
 
 }
