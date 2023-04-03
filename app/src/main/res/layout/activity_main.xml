@@ -11,24 +11,17 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent">
 
-        <ImageView
-            android:id="@+id/music_image"
+        <androidx.fragment.app.FragmentContainerView
+            android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="460dp" />
-
-        <ImageView
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:src="@drawable/ic_baseline_playlist_play_24"
-            android:layout_below="@id/music_image"/>
-
+            android:layout_height="match_parent" />
 
 
         <androidx.appcompat.widget.AppCompatSeekBar
             android:id="@+id/seek_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="540dp"/>
+            android:layout_marginTop="640dp" />
 
         <TextView
             android:id="@+id/text"
@@ -50,11 +43,27 @@
             android:layout_marginTop="4dp"/>
 
         <RelativeLayout
+            android:id="@+id/play_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_below="@id/seek_bar"
             android:layout_centerHorizontal="true"
-            android:layout_marginTop="20dp">
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="16dp">
+
+            <ImageView
+                android:id="@+id/list"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/ic_baseline_playlist_play_24" />
+
+            <ImageView
+                android:id="@+id/info"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_marginLeft="8dp"
+                android:src="@drawable/ic_baseline_image_24"
+                android:visibility="invisible"/>
 
             <ImageView
                 android:id="@+id/play"

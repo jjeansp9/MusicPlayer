@@ -3,6 +3,9 @@ package kr.co.musicplayer.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 
 import android.content.ContentResolver;
 import android.content.ContentValues;
@@ -27,25 +30,32 @@ import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 
 import kr.co.musicplayer.R;
-import kr.co.musicplayer.databinding.ActivityDrawerBinding;
 import kr.co.musicplayer.databinding.ActivityMainBinding;
+import kr.co.musicplayer.fragments.MusicInfoFragment;
+import kr.co.musicplayer.fragments.MusicListFragment;
 import kr.co.musicplayer.model.User;
 
 public class MainActivity extends AppCompatActivity {
 
-    ActivityMainBinding binding;
+    private ActivityMainBinding binding;
 
-    TextView userName;
-    ImageView userImage;
-    TextView userEmail;
-    private DrawerLayout drawerLayout;
-    View navBar;
+    private TextView userName;
+    private ImageView userImage;
+    private TextView userEmail;
+//    private DrawerLayout drawerLayout;
+//    View navBar;
 
-    User user= new User();
+    private ArrayList<Fragment> fragments= new ArrayList<>();
+    private FragmentManager fragmentManager= null;
+    private int num= 0;
+    private boolean[] result= {false,false};
 
-    MediaPlayer mp;
+    private User user= new User();
+
+    private MediaPlayer mp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,7 +65,7 @@ public class MainActivity extends AppCompatActivity {
 
         getUserData();
 
-
+        createFragment();
 
 //        userName= findViewById(R.id.user_name);
 //        userName.setOnClickListener(new View.OnClickListener() {
@@ -65,7 +75,8 @@ public class MainActivity extends AppCompatActivity {
 //            }
 //        });
 
-
+        binding.list.setOnClickListener(v->clickedFragment(0));
+        binding.info.setOnClickListener(v->clickedFragment(1));
 
         seekBar();
 
@@ -73,6 +84,39 @@ public class MainActivity extends AppCompatActivity {
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
 
     } // onCreate()
+
+    private void createFragment(){
+        fragments.add(0, new MusicListFragment());
+        fragments.add(1, new MusicInfoFragment());
+
+        fragmentManager= getSupportFragmentManager();
+        fragmentManager.beginTransaction().add(R.id.fragment_container, fragments.get(1)).commit();
+        result[1]= true;
+    }
+
+    private void clickedFragment(int num){
+        if (num==0){
+            binding.info.setVisibility(View.VISIBLE);
+            binding.list.setVisibility(View.INVISIBLE);
+        }else{
+            binding.info.setVisibility(View.INVISIBLE);
+            binding.list.setVisibility(View.VISIBLE);
+        }
+
+        FragmentTransaction tran= fragmentManager.beginTransaction();
+
+        if (!result[num]){
+            tran.add(R.id.fragment_container, fragments.get(num));
+            result[num] = true;
+        }
+
+        for (int i=0; i<fragments.size(); i++){
+            if (fragments.get(i)!=null){ tran.hide(fragments.get(i)); }
+        }
+
+        tran.show(fragments.get(num)).commit();
+    }
+
 
     private void getUserData(){
 
