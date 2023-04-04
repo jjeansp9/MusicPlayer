@@ -1,14 +1,17 @@
 package kr.co.musicplayer.activities;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.annotation.SuppressLint;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.database.Cursor;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Build;
@@ -193,58 +196,58 @@ public class MainActivity extends AppCompatActivity {
 
         binding.textMax.setText(strTime);
 
-        saveFile();
     }
 
     // 음악 일시정지
+
     private void musicPause(){
         mp.pause();
         binding.play.setVisibility(View.VISIBLE);
         binding.pause.setVisibility(View.INVISIBLE);
     }
 
-    // 오디오 파일 저장
-    private void saveFile() {
-        ContentValues values = new ContentValues();
-        values.put(MediaStore.Audio.Media.DISPLAY_NAME, "beethoven_piano_sonata_01.mp3");
-        values.put(MediaStore.Audio.Media.ALBUM, "beethoven_piano_sonata_01.mp3");
-        values.put(MediaStore.Audio.Media.ALBUM_ARTIST, R.raw.beethoven_piano_sonata_01);
-        values.put(MediaStore.Audio.Media.MIME_TYPE, "audio/*");
-        //MediaStore.Audio.Media.IS_MUSIC
+    // 오디오 파일 데이터 가져오기
+    @SuppressLint("Range")
+    private void getMusic() {
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            values.put(MediaStore.Audio.Media.IS_PENDING, 1);
-        }
+        String[] projection = {
+                MediaStore.Audio.Media._ID,
+                MediaStore.Audio.Media.TITLE,
+                MediaStore.Audio.Media.DATA,
+                MediaStore.Audio.Media.COMPOSER,
+                MediaStore.Audio.Media.DURATION,
+                MediaStore.Audio.Media.ALBUM_ID,
+        };
 
-        ContentResolver contentResolver = getContentResolver();
-        Uri item = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values);
+        Log.d("ContentUri", MediaStore.Audio.Media.EXTERNAL_CONTENT_URI+"");
 
-        try {
-            ParcelFileDescriptor pdf = contentResolver.openFileDescriptor(item, "w", null);
+        Cursor cursor = getContentResolver().query(
+                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
+                projection,
+                null,
+                null,
+                null);
 
-            if (pdf == null) {
-                Log.d("asdf", "null");
-            } else {
-                String str = "heloo";
-                byte[] strToByte = str.getBytes();
-                FileOutputStream fos = new FileOutputStream(pdf.getFileDescriptor());
-                fos.write(strToByte);
-                fos.close();
-
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    values.clear();
-                    values.put(MediaStore.Audio.Media.IS_PENDING, 0);
-                    contentResolver.update(item, values, null, null);
-                }
-
+        if (cursor != null){
+            while (cursor.moveToNext()) {
+                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.COMPOSER));
+                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
+                String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
             }
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
+            cursor.close();
         }
     }
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // MediaPlayer 해지
+        if(mp != null) {
+            mp.release();
+            mp = null;
+        }
+    }
 }
 
 
