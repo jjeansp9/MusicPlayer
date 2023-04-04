@@ -6,15 +6,20 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Bundle;
+import android.provider.MediaStore;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import kr.co.musicplayer.R;
@@ -22,8 +27,9 @@ import kr.co.musicplayer.databinding.ActivityMainBinding;
 import kr.co.musicplayer.fragments.MusicInfoFragment;
 import kr.co.musicplayer.fragments.MusicListFragment;
 import kr.co.musicplayer.User;
+import kr.co.musicplayer.model.OnDataPass;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     private ActivityMainBinding binding;
 
@@ -40,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
 
     private User user= new User();
 
-    private MediaPlayer mp;
+    private MediaPlayer mp= new MediaPlayer();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -65,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
 
         //seekBar();
 
-        //binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
+        binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
 
     } // onCreate()
@@ -100,6 +106,65 @@ public class MainActivity extends AppCompatActivity {
         }
 
         tran.show(fragments.get(num)).commit();
+    }
+
+    private void musicPlay(){
+
+        Log.d("mpTest", mp.getDuration()+"");
+
+        if (mp.getDuration()==0){
+            Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+        }else{
+            mp.start();
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (mp.isPlaying()){
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
+
+            binding.play.setVisibility(View.INVISIBLE);
+            binding.pause.setVisibility(View.VISIBLE);
+        }
+
+    }
+
+    // Fragment에서 넘긴 데이터 받아오는 메소드
+    @Override
+    public void onDataPass(String artist, String title, String duration, String data) {
+        // 데이터 처리 코드 작성하기
+        Log.d("FragmentData", artist+ ", " + title + ", " + duration + ", " + data);
+
+        try {
+            mp.reset();
+            mp.setDataSource(data);
+            mp.prepare();
+            mp.start();
+
+        } catch (IOException e) {
+            Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while (mp.isPlaying()){
+                    try {
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }).start();
+        binding.play.setVisibility(View.INVISIBLE);
+        binding.pause.setVisibility(View.VISIBLE);
     }
 
 
@@ -177,7 +242,6 @@ public class MainActivity extends AppCompatActivity {
 //        String strTime = String.format("%02d:%02d", m, s);
 //
 //        binding.textMax.setText(strTime);
-//
 //    }
 
     // 음악 일시정지
@@ -199,6 +263,8 @@ public class MainActivity extends AppCompatActivity {
             mp = null;
         }
     }
+
+
 }
 
 

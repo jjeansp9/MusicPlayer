@@ -48,6 +48,7 @@ public class RecyclerMusicListAdapter extends RecyclerView.Adapter<RecyclerMusic
         holder.binding.composer.setText(item.getArtist());
         holder.binding.title.setText(item.getTitle());
         holder.binding.duration.setText(item.getDuration());
+        holder.binding.data.setText(item.getData());
 
         holder.binding.getRoot().setOnClickListener( v -> itemClickListener.onClick(holder.binding.getRoot(), position));
     }
