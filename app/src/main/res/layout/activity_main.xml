@@ -14,33 +14,7 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-
-        <androidx.appcompat.widget.AppCompatSeekBar
-            android:id="@+id/seek_bar"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="640dp" />
-
-        <TextView
-            android:id="@+id/text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/seek_bar"
-            android:layout_marginLeft="10dp"
-            android:text="00:00"
-            android:layout_marginTop="4dp"/>
-
-        <TextView
-            android:id="@+id/text_max"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="00:00"
-            android:layout_below="@id/seek_bar"
-            android:layout_alignParentRight="true"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="4dp"/>
+            android:layout_height="720dp"/>
 
         <RelativeLayout
             android:id="@+id/play_bar"
@@ -48,24 +22,28 @@
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
-            android:layout_marginBottom="16dp">
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:background="#ECECEC">
 
             <ImageView
                 android:id="@+id/list"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/ic_baseline_playlist_play_24"
-                android:layout_centerVertical="true"/>
+                android:layout_centerVertical="true"
+                android:visibility="invisible"
+                android:padding="4dp"/>
 
             <ImageView
                 android:id="@+id/info"
-                android:layout_width="40dp"
-                android:layout_height="40dp"
+                android:layout_width="50dp"
+                android:layout_height="50dp"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
                 android:src="@drawable/ic_baseline_image_24"
-                android:visibility="invisible"
-                android:layout_centerVertical="true"/>
+                android:padding="4dp"/>
 
             <ImageView
                 android:id="@+id/play"

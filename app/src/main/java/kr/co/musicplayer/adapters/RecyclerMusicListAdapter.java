@@ -24,6 +24,16 @@ public class RecyclerMusicListAdapter extends RecyclerView.Adapter<RecyclerMusic
         this.items = items;
     }
 
+    public interface OnItemClickListener{
+        void onClick(View view, int position);
+    }
+
+    private OnItemClickListener itemClickListener;
+
+    public void setItemClickListener(OnItemClickListener onItemClickListener){
+        this.itemClickListener= onItemClickListener;
+    }
+
     @NonNull
     @Override
     public VH onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -38,6 +48,8 @@ public class RecyclerMusicListAdapter extends RecyclerView.Adapter<RecyclerMusic
         holder.binding.composer.setText(item.getArtist());
         holder.binding.title.setText(item.getTitle());
         holder.binding.duration.setText(item.getDuration());
+
+        holder.binding.getRoot().setOnClickListener( v -> itemClickListener.onClick(holder.binding.getRoot(), position));
     }
 
     @Override

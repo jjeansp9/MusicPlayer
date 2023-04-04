@@ -81,9 +81,9 @@ public class MainActivity extends AppCompatActivity {
         binding.list.setOnClickListener(v->clickedFragment(0));
         binding.info.setOnClickListener(v->clickedFragment(1));
 
-        seekBar();
+        //seekBar();
 
-        binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
+        //binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
 
     } // onCreate()
@@ -93,8 +93,8 @@ public class MainActivity extends AppCompatActivity {
         fragments.add(1, new MusicInfoFragment());
 
         fragmentManager= getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.fragment_container, fragments.get(1)).commit();
-        result[1]= true;
+        fragmentManager.beginTransaction().add(R.id.fragment_container, fragments.get(0)).commit();
+        result[0]= true;
     }
 
     private void clickedFragment(int num){
@@ -108,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
 
         FragmentTransaction tran= fragmentManager.beginTransaction();
 
-        if (!result[num]){
-            tran.add(R.id.fragment_container, fragments.get(num));
-            result[num] = true;
+        if (!result[1]){
+            tran.add(R.id.fragment_container, fragments.get(1));
+            result[1] = true;
         }
 
         for (int i=0; i<fragments.size(); i++){
@@ -144,59 +144,59 @@ public class MainActivity extends AppCompatActivity {
         userEmail.setText(user.getEmail());
     }
 
-    private void seekBar(){
-        mp= MediaPlayer.create(this, R.raw.beethoven_piano_sonata_01);
-
-        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
-        binding.seekBar.setMax(mp.getDuration());
-        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser){
-                    mp.seekTo(progress);
-                }
-                int m= progress / 60000;
-                int s= (progress % 60000) / 1000;
-                String strTime = String.format("%02d:%02d", m, s);
-                binding.text.setText(strTime);
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-    }
+//    private void seekBar(){
+//        mp= MediaPlayer.create(this, R.raw.beethoven_piano_sonata_01);
+//
+//        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
+//        binding.seekBar.setMax(mp.getDuration());
+//        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                if (fromUser){
+//                    mp.seekTo(progress);
+//                }
+//                int m= progress / 60000;
+//                int s= (progress % 60000) / 1000;
+//                String strTime = String.format("%02d:%02d", m, s);
+//                binding.text.setText(strTime);
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//            }
+//        });
+//    }
 
     // 음악 재생
-    private void musicPlay(){
-        mp.start();
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (mp.isPlaying()){
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    binding.seekBar.setProgress(mp.getCurrentPosition());
-                }
-            }
-        }).start();
-        binding.play.setVisibility(View.INVISIBLE);
-        binding.pause.setVisibility(View.VISIBLE);
-
-        int m= mp.getDuration() / 60000;
-        int s= (mp.getDuration() % 60000) / 1000;
-        String strTime = String.format("%02d:%02d", m, s);
-
-        binding.textMax.setText(strTime);
-
-    }
+//    private void musicPlay(){
+//        mp.start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (mp.isPlaying()){
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    binding.seekBar.setProgress(mp.getCurrentPosition());
+//                }
+//            }
+//        }).start();
+//        binding.play.setVisibility(View.INVISIBLE);
+//        binding.pause.setVisibility(View.VISIBLE);
+//
+//        int m= mp.getDuration() / 60000;
+//        int s= (mp.getDuration() % 60000) / 1000;
+//        String strTime = String.format("%02d:%02d", m, s);
+//
+//        binding.textMax.setText(strTime);
+//
+//    }
 
     // 음악 일시정지
 
@@ -206,38 +206,7 @@ public class MainActivity extends AppCompatActivity {
         binding.pause.setVisibility(View.INVISIBLE);
     }
 
-    // 오디오 파일 데이터 가져오기
-    @SuppressLint("Range")
-    private void getMusic() {
 
-        String[] projection = {
-                MediaStore.Audio.Media._ID,
-                MediaStore.Audio.Media.TITLE,
-                MediaStore.Audio.Media.DATA,
-                MediaStore.Audio.Media.COMPOSER,
-                MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.ALBUM_ID,
-        };
-
-        Log.d("ContentUri", MediaStore.Audio.Media.EXTERNAL_CONTENT_URI+"");
-
-        Cursor cursor = getContentResolver().query(
-                MediaStore.Audio.Media.EXTERNAL_CONTENT_URI,
-                projection,
-                null,
-                null,
-                null);
-
-        if (cursor != null){
-            while (cursor.moveToNext()) {
-                String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.COMPOSER));
-                String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
-                String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
-                String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
-            }
-            cursor.close();
-        }
-    }
 
     @Override
     protected void onDestroy() {
