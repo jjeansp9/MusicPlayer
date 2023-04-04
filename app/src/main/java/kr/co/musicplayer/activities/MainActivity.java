@@ -24,9 +24,11 @@ import java.util.ArrayList;
 
 import kr.co.musicplayer.R;
 import kr.co.musicplayer.databinding.ActivityMainBinding;
+import kr.co.musicplayer.fragments.BlankFragment;
 import kr.co.musicplayer.fragments.MusicInfoFragment;
 import kr.co.musicplayer.fragments.MusicListFragment;
 import kr.co.musicplayer.User;
+import kr.co.musicplayer.model.MediaFile;
 import kr.co.musicplayer.model.OnDataPass;
 
 public class MainActivity extends AppCompatActivity implements OnDataPass {
@@ -58,6 +60,10 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         createFragment();
 
+        Bundle bundle= new Bundle();
+        bundle.putString("hi", "hi");
+        fragments.get(0).setArguments(bundle);
+
 //        userName= findViewById(R.id.user_name);
 //        userName.setOnClickListener(new View.OnClickListener() {
 //            @Override
@@ -74,7 +80,17 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
 
+
+        // 프래그먼트 추가
+//        FragmentManager fragmentManager = getSupportFragmentManager();
+//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+//        fragmentTransaction.add(R.id.fragment, new MusicListFragment());
+//        fragmentTransaction.add(R.id.fragment, new MusicInfoFragment());
+//        fragmentTransaction.commit();
+
+
     } // onCreate()
+
 
     private void createFragment(){
         fragments.add(0, new MusicListFragment());
@@ -86,6 +102,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     }
 
     private void clickedFragment(int num){
+
         if (num==0){
             binding.info.setVisibility(View.VISIBLE);
             binding.list.setVisibility(View.INVISIBLE);
@@ -137,13 +154,13 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     // Fragment에서 넘긴 데이터 받아오는 메소드
     @Override
-    public void onDataPass(String artist, String title, String duration, String data) {
+    public void onDataPass(MediaFile item, int position) {
         // 데이터 처리 코드 작성하기
-        Log.d("FragmentData", artist+ ", " + title + ", " + duration + ", " + data);
+        Log.d("FragmentData", item.getArtist()+ ", " + item.getTitle() + ", " + item.getDuration() + ", " + item.getData());
 
         try {
             mp.reset();
-            mp.setDataSource(data);
+            mp.setDataSource(item.getData());
             mp.prepare();
             mp.start();
 

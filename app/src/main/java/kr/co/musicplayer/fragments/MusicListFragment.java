@@ -39,6 +39,7 @@ public class MusicListFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding= FragmentMusicListBinding.inflate(inflater, container, false);
+
         return binding.getRoot();
     }
 
@@ -55,10 +56,16 @@ public class MusicListFragment extends Fragment {
     }
 
     @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+    }
+
+    @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
         dataPass= (OnDataPass) context;
     }
+
 
     // 오디오 파일 데이터 가져오기
     @SuppressLint("Range")
@@ -105,19 +112,14 @@ public class MusicListFragment extends Fragment {
                 Toast.makeText(getActivity(), items.get(position).getArtist(), Toast.LENGTH_SHORT).show();
 
                 // 액티비티로 데이터 넘기기
-                passData(
-                        items.get(position).getArtist(),
-                        items.get(position).getTitle(),
-                        items.get(position).getDuration(),
-                        items.get(position).getData()
-                );
+                passData(items.get(position), position);
             }
         });
     }
 
     // 액티비티로 데이터 넘겨주는 메소드
-    public void passData(String artist, String title, String duration, String data){
-        dataPass.onDataPass(artist, title, duration, data);
+    public void passData(MediaFile item, int position){
+        dataPass.onDataPass(item, position);
     }
 }
 

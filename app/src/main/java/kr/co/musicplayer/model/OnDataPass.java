@@ -1,6 +1,7 @@
 package kr.co.musicplayer.model;
 
-public interface OnDataPass {
-    void onDataPass(String artist, String title, String duration, String data);
+import java.util.ArrayList;
 
+public interface OnDataPass {
+    void onDataPass(MediaFile item, int position);
 }
