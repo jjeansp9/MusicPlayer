@@ -34,6 +34,10 @@
             android:name=".activities.LoginTestActivity"
             android:exported="false"
             />
+
+        <!--    서비스 등록록    -->
+        <service android:name=".activities.MusicService"/>
+
         <activity
             android:name=".activities.LoginActivity"
             android:exported="true"

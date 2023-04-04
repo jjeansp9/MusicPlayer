@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -88,9 +89,33 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //        fragmentTransaction.add(R.id.fragment, new MusicInfoFragment());
 //        fragmentTransaction.commit();
 
+        Intent intent = new Intent(getApplicationContext(), MusicService.class);
+        intent.putExtra("command", "show");
+        intent.putExtra("name", "music");
+        startService(intent); // Service에 데이터를 전달한다.
+
+        Intent passedIntent = getIntent(); // Service에서 보낸 Intent 객체를 전달받음
+        processIntent(passedIntent);
+
 
     } // onCreate()
 
+    @Override
+    protected void onNewIntent(Intent intent) {
+
+        processIntent(intent);
+        super.onNewIntent(intent);
+    }
+
+    private void processIntent(Intent intent) {
+
+        if (intent != null) {
+            String command = intent.getStringExtra("command");
+            String name = intent.getStringExtra("name");
+
+            Toast.makeText(this, "command : " + command + ", name : " + name, Toast.LENGTH_LONG).show();
+        }
+    }
 
     private void createFragment(){
         fragments.add(0, new MusicListFragment());
@@ -126,6 +151,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     }
 
     private void musicPlay(){
+
+        Intent intent= new Intent(getApplicationContext(), MusicService.class);
+        startService(intent);
 
         Log.d("mpTest", mp.getDuration()+"");
 
@@ -183,7 +211,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
     }
-
 
     private void getUserData(){
 
@@ -267,6 +294,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         mp.pause();
         binding.play.setVisibility(View.VISIBLE);
         binding.pause.setVisibility(View.INVISIBLE);
+
+        Intent intent = new Intent(getApplicationContext(), MusicService.class);
+        stopService(intent);
     }
 
 
