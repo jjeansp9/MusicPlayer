@@ -1,45 +1,27 @@
 package kr.co.musicplayer.activities;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.annotation.SuppressLint;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.database.Cursor;
 import android.media.MediaPlayer;
-import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.os.ParcelFileDescriptor;
-import android.provider.MediaStore;
-import android.util.Log;
-import android.view.MotionEvent;
 import android.view.View;
 import android.widget.ImageView;
-import android.widget.ProgressBar;
-import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 
 import kr.co.musicplayer.R;
 import kr.co.musicplayer.databinding.ActivityMainBinding;
 import kr.co.musicplayer.fragments.MusicInfoFragment;
 import kr.co.musicplayer.fragments.MusicListFragment;
-import kr.co.musicplayer.model.User;
+import kr.co.musicplayer.User;
 
 public class MainActivity extends AppCompatActivity {
 

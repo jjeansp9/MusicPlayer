@@ -1,4 +1,4 @@
-package kr.co.musicplayer.model;
+package kr.co.musicplayer;
 
 public class User {
 

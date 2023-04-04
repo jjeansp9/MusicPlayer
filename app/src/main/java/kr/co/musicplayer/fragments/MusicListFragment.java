@@ -88,6 +88,7 @@ public class MusicListFragment extends Fragment {
         }
     }
 
+    // 클릭한 아이템의 데이터 액티비티로 전달하기
     private void clickedItems(){
         adapter.setItemClickListener(new RecyclerMusicListAdapter.OnItemClickListener() {
             @Override

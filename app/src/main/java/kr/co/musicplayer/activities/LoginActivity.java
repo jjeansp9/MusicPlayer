@@ -9,7 +9,6 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.content.Intent;
@@ -40,7 +39,7 @@ import com.navercorp.nid.profile.data.NidProfileResponse;
 import kotlin.Unit;
 import kotlin.jvm.functions.Function2;
 import kr.co.musicplayer.databinding.ActivityLoginBinding;
-import kr.co.musicplayer.model.User;
+import kr.co.musicplayer.User;
 
 public class LoginActivity extends AppCompatActivity {
 
