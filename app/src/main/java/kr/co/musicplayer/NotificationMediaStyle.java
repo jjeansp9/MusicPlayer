@@ -21,14 +21,14 @@ import kr.co.musicplayer.activities.MainActivity;
 
 public class NotificationMediaStyle {
 
-    private MusicService musicService;
-
-    protected void craeteNotification(Context context){
+    public void craeteNotification(Context context){
 
         // 운영체제로부터 알림(Notification)을 관리하는 관리자 객체 소환
-        NotificationManager notificationManager= (NotificationManager) musicService.getSystemService(Context.NOTIFICATION_SERVICE);
+        NotificationManager notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         // Notification 객체를 생성해주는 Builder 객체 생성
         NotificationCompat.Builder builder= null;
+
+        Log.e("getSystem", context.getSystemService(Context.NOTIFICATION_SERVICE)+"");
 
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.O){ // 디바이스 버전이 26버전(Oreo버전) 이상이라면
 
@@ -45,14 +45,11 @@ public class NotificationMediaStyle {
 
         // 알림창을 클릭했을 때 실행될 작업( 새로운 화면[SecondActivity] ) 실행 설정
         Intent intent= new Intent(context, MainActivity.class);
-
-        // 지금 당장 Intent가 화면을 실행하는 것이 아니기에 잠시 보류시켜야 함
-        // 보류중인 Intent로 만들어야 함
+//
+//        // 지금 당장 Intent가 화면을 실행하는 것이 아니기에 잠시 보류시켜야 함
+//        // 보류중인 Intent로 만들어야 함
         PendingIntent pendingIntent= PendingIntent.getActivity(context, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         builder.setContentIntent(pendingIntent);
-
-        MediaSessionCompat mediaSession = new MediaSessionCompat(context, "MediaSession");
-        //mediaSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
 
         Intent prevIntent = new Intent(context, MusicService.class);
 

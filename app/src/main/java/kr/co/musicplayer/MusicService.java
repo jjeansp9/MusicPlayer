@@ -90,8 +90,8 @@ public class MusicService extends Service {
         showIntent.putExtra("data", command);
         startActivity(showIntent); // Service에서 Activity로 데이터를 전달
 
-        String pause = intent.getStringExtra("pause");
-        Log.i("pauses", pause);
+//        String pause = intent.getStringExtra("pause");
+//        Log.i("pauses", pause);
 
         return command;
     }
