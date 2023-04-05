@@ -52,9 +52,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     private User user= new User();
 
-    private MediaPlayer mp= new MediaPlayer();
     MusicService musicService;
     Intent intent;
+    int position;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,9 +68,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         createFragment();
 
-        Bundle bundle= new Bundle();
-        bundle.putString("hi", "hi");
-        fragments.get(0).setArguments(bundle);
+
 
 //        userName= findViewById(R.id.user_name);
 //        userName.setOnClickListener(new View.OnClickListener() {
@@ -88,6 +86,8 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
 
+        binding.playPrevious.setOnClickListener(v -> playPreviousMusic());
+        binding.playNext.setOnClickListener(v -> playNextMusic());
 
 
 
@@ -102,6 +102,33 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
 
     } // onCreate()
+
+    @Override
+    public void onBackPressed() {
+        // 뒤로 가기 버튼 이벤트 처리
+        // 홈 버튼 기능 수행
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
+
+
+    // 플레이중인 음악의 이전 음악 플레이하기
+    private void playPreviousMusic(){
+
+        // 프래그먼트로 데이터 전달
+        MusicListFragment myFragment = MusicListFragment.newInstance("position", position);
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, myFragment, "position")
+                .commit();
+    }
+
+    // 플레이중인 음악의 다음 음악 플레이하기
+    private void playNextMusic(){
+
+    }
 
 
     // MusicService와 연결
@@ -227,9 +254,12 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     public void onDataPass(MediaFile item, int position) {
 
         putDataToService(item);
+        this.position = position;
 
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
+
+
     }
 
     private void getUserData(){

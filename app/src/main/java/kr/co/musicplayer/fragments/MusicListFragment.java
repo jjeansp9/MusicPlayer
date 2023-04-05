@@ -38,14 +38,14 @@ public class MusicListFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private String mParam1;
-    private String mParam2;
+    private String mParam1="";
+    private int mParam2;
 
-    public static MusicListFragment newInstance(String param1, String param2) {
+    public static MusicListFragment newInstance(String param1, int param2) {
         MusicListFragment fragment = new MusicListFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
+        args.putInt(ARG_PARAM2, param2);
         fragment.setArguments(args);
         return fragment;
     }
@@ -56,8 +56,10 @@ public class MusicListFragment extends Fragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        mParam1 = getArguments().getString(ARG_PARAM1);
-        mParam2 = getArguments().getString(ARG_PARAM2);
+        if (getArguments() != null) {
+            mParam1 = getArguments().getString(ARG_PARAM1);
+            mParam2 = getArguments().getInt(ARG_PARAM2);
+        }
     }
 
     @Nullable
@@ -76,10 +78,17 @@ public class MusicListFragment extends Fragment {
         binding.recycler.setAdapter(adapter);
         binding.recycler.addItemDecoration(new DividerItemDecoration(requireActivity(), LinearLayout.VERTICAL));
 
+        Log.i("fragmentValue onViewCreated", mParam1+", "+mParam2);
+
         getMusic();
         clickedItems();
     }
 
+//    @Override
+//    public void onResume() {
+//        Log.i("fragmentValue onResume", mParam1+", "+mParam2);
+//        super.onResume();
+//    }
 
     @Override
     public void onAttach(@NonNull Context context) {
