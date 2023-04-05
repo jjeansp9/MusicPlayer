@@ -35,6 +35,31 @@ public class MusicListFragment extends Fragment {
 
     private OnDataPass dataPass;
 
+    private static final String ARG_PARAM1 = "param1";
+    private static final String ARG_PARAM2 = "param2";
+
+    private String mParam1;
+    private String mParam2;
+
+    public static MusicListFragment newInstance(String param1, String param2) {
+        MusicListFragment fragment = new MusicListFragment();
+        Bundle args = new Bundle();
+        args.putString(ARG_PARAM1, param1);
+        args.putString(ARG_PARAM2, param2);
+        fragment.setArguments(args);
+        return fragment;
+    }
+
+    public MusicListFragment() {
+    }
+
+    @Override
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        mParam1 = getArguments().getString(ARG_PARAM1);
+        mParam2 = getArguments().getString(ARG_PARAM2);
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -55,10 +80,6 @@ public class MusicListFragment extends Fragment {
         clickedItems();
     }
 
-    @Override
-    public void onCreate(@Nullable Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-    }
 
     @Override
     public void onAttach(@NonNull Context context) {

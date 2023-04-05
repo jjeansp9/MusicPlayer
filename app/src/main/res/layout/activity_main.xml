@@ -14,14 +14,8 @@
         <androidx.fragment.app.FragmentContainerView
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
-            android:layout_height="420dp" />
-
-        <FrameLayout
-            android:id="@+id/fragment"
-            android:layout_width="match_parent"
-            android:layout_height="300dp"
-            android:layout_below="@id/fragment_container"/>
-
+            android:layout_height="match_parent"
+            android:layout_above="@id/play_bar"/>
 
         <RelativeLayout
             android:id="@+id/play_bar"

@@ -5,10 +5,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.content.ComponentName;
 import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.View;
@@ -39,23 +42,27 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private TextView userName;
     private ImageView userImage;
     private TextView userEmail;
-//    private DrawerLayout drawerLayout;
+
+    //    private DrawerLayout drawerLayout;
 //    View navBar;
 
     private ArrayList<Fragment> fragments= new ArrayList<>();
     private FragmentManager fragmentManager= null;
-    private int num= 0;
     private boolean[] result= {false,false};
 
     private User user= new User();
 
     private MediaPlayer mp= new MediaPlayer();
+    MusicService musicService;
+    Intent intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding= ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+
+        intent = new Intent(getApplicationContext(), MusicService.class);
 
         getUserData();
 
@@ -82,6 +89,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
 
 
+
+
+
         // 프래그먼트 추가
 //        FragmentManager fragmentManager = getSupportFragmentManager();
 //        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
@@ -89,33 +99,70 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //        fragmentTransaction.add(R.id.fragment, new MusicInfoFragment());
 //        fragmentTransaction.commit();
 
-        Intent intent = new Intent(getApplicationContext(), MusicService.class);
-        intent.putExtra("command", "show");
-        intent.putExtra("name", "music");
-        startService(intent); // Service에 데이터를 전달한다.
-
-        Intent passedIntent = getIntent(); // Service에서 보낸 Intent 객체를 전달받음
-        processIntent(passedIntent);
 
 
     } // onCreate()
 
+
+    // MusicService와 연결
+    ServiceConnection connection= new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MusicService.MyBinder binder= (MusicService.MyBinder) iBinder;
+            musicService= binder.getMyServiceAddress();
+
+            Log.i("onServiceConnected", "onServiceConnected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
+
+
+
+    // Service에 데이터 보내기
+    private void putDataToService(MediaFile item){
+
+        if(musicService==null){
+            // MyService를 시작하기
+            intent.putExtra("data", item.getData());
+            startService(intent);
+
+            // MyService와 연결(Bind)
+            bindService(intent, connection, 0); // 해당코드 입력시 MyService.java에 onBind() 실행
+        }else{
+            intent.putExtra("data", item.getData());
+            startService(intent);
+        }
+
+
+    }
+
     @Override
     protected void onNewIntent(Intent intent) {
 
-        processIntent(intent);
+        //getDataFromService(intent);
+
         super.onNewIntent(intent);
     }
 
-    private void processIntent(Intent intent) {
-
-        if (intent != null) {
-            String command = intent.getStringExtra("command");
-            String name = intent.getStringExtra("name");
-
-            Toast.makeText(this, "command : " + command + ", name : " + name, Toast.LENGTH_LONG).show();
-        }
-    }
+//    // Service에서 보낸 데이터 받기
+//    private void getDataFromService(Intent intent) {
+//
+//        String command="";
+//        if (intent != null) command = intent.getStringExtra("data");
+//
+//        try {
+//            mp.setDataSource(command);
+//            mp.pause();
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//        binding.play.setVisibility(View.VISIBLE);
+//        binding.pause.setVisibility(View.INVISIBLE);
+//    }
 
     private void createFragment(){
         fragments.add(0, new MusicListFragment());
@@ -150,32 +197,27 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         tran.show(fragments.get(num)).commit();
     }
 
+    // 음악 재생
     private void musicPlay(){
 
-        Intent intent= new Intent(getApplicationContext(), MusicService.class);
-        startService(intent);
-
-        Log.d("mpTest", mp.getDuration()+"");
-
-        if (mp.getDuration()==0){
-            Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
-        }else{
-            mp.start();
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (mp.isPlaying()){
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
+        if (musicService!=null){
+            musicService.musicStart();
 
             binding.play.setVisibility(View.INVISIBLE);
             binding.pause.setVisibility(View.VISIBLE);
+        }else{
+            Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+        }
+
+    }
+
+    // 음악 일시정지
+    private void musicPause(){
+
+        if (musicService!=null){
+            musicService.musicPause();
+            binding.play.setVisibility(View.VISIBLE);
+            binding.pause.setVisibility(View.INVISIBLE);
         }
 
     }
@@ -183,31 +225,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     // Fragment에서 넘긴 데이터 받아오는 메소드
     @Override
     public void onDataPass(MediaFile item, int position) {
-        // 데이터 처리 코드 작성하기
-        Log.d("FragmentData", item.getArtist()+ ", " + item.getTitle() + ", " + item.getDuration() + ", " + item.getData());
 
-        try {
-            mp.reset();
-            mp.setDataSource(item.getData());
-            mp.prepare();
-            mp.start();
+        putDataToService(item);
 
-        } catch (IOException e) {
-            Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (mp.isPlaying()){
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
     }
@@ -287,30 +307,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //
 //        binding.textMax.setText(strTime);
 //    }
-
-    // 음악 일시정지
-
-    private void musicPause(){
-        mp.pause();
-        binding.play.setVisibility(View.VISIBLE);
-        binding.pause.setVisibility(View.INVISIBLE);
-
-        Intent intent = new Intent(getApplicationContext(), MusicService.class);
-        stopService(intent);
-    }
-
-
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        // MediaPlayer 해지
-        if(mp != null) {
-            mp.release();
-            mp = null;
-        }
-    }
-
 
 }
 
