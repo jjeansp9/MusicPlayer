@@ -1,18 +1,23 @@
 package kr.co.musicplayer.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.media.MediaPlayer;
-import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.provider.MediaStore;
+import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -23,12 +28,11 @@ import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 
-import java.io.IOException;
 import java.util.ArrayList;
 
+import kr.co.musicplayer.MusicService;
 import kr.co.musicplayer.R;
 import kr.co.musicplayer.databinding.ActivityMainBinding;
-import kr.co.musicplayer.fragments.BlankFragment;
 import kr.co.musicplayer.fragments.MusicInfoFragment;
 import kr.co.musicplayer.fragments.MusicListFragment;
 import kr.co.musicplayer.User;
@@ -148,7 +152,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     };
 
 
-
     // Service에 데이터 보내기
     private void putDataToService(MediaFile item){
 
@@ -163,8 +166,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             intent.putExtra("data", item.getData());
             startService(intent);
         }
-
-
     }
 
     @Override
@@ -191,38 +192,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //        binding.pause.setVisibility(View.INVISIBLE);
 //    }
 
-    private void createFragment(){
-        fragments.add(0, new MusicListFragment());
-        fragments.add(1, new MusicInfoFragment());
-
-        fragmentManager= getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.fragment_container, fragments.get(0)).commit();
-        result[0]= true;
-    }
-
-    private void clickedFragment(int num){
-
-        if (num==0){
-            binding.info.setVisibility(View.VISIBLE);
-            binding.list.setVisibility(View.INVISIBLE);
-        }else{
-            binding.info.setVisibility(View.INVISIBLE);
-            binding.list.setVisibility(View.VISIBLE);
-        }
-
-        FragmentTransaction tran= fragmentManager.beginTransaction();
-
-        if (!result[1]){
-            tran.add(R.id.fragment_container, fragments.get(1));
-            result[1] = true;
-        }
-
-        for (int i=0; i<fragments.size(); i++){
-            if (fragments.get(i)!=null){ tran.hide(fragments.get(i)); }
-        }
-
-        tran.show(fragments.get(num)).commit();
-    }
 
     // 음악 재생
     private void musicPlay(){
@@ -232,6 +201,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
             binding.play.setVisibility(View.INVISIBLE);
             binding.pause.setVisibility(View.VISIBLE);
+
         }else{
             Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
         }
@@ -249,6 +219,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     }
 
+
     // Fragment에서 넘긴 데이터 받아오는 메소드
     @Override
     public void onDataPass(MediaFile item, int position) {
@@ -258,7 +229,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
-
 
     }
 
@@ -337,6 +307,39 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //
 //        binding.textMax.setText(strTime);
 //    }
+
+    private void createFragment(){
+        fragments.add(0, new MusicListFragment());
+        fragments.add(1, new MusicInfoFragment());
+
+        fragmentManager= getSupportFragmentManager();
+        fragmentManager.beginTransaction().add(R.id.fragment_container, fragments.get(0)).commit();
+        result[0]= true;
+    }
+
+    private void clickedFragment(int num){
+
+        if (num==0){
+            binding.info.setVisibility(View.VISIBLE);
+            binding.list.setVisibility(View.INVISIBLE);
+        }else{
+            binding.info.setVisibility(View.INVISIBLE);
+            binding.list.setVisibility(View.VISIBLE);
+        }
+
+        FragmentTransaction tran= fragmentManager.beginTransaction();
+
+        if (!result[1]){
+            tran.add(R.id.fragment_container, fragments.get(1));
+            result[1] = true;
+        }
+
+        for (int i=0; i<fragments.size(); i++){
+            if (fragments.get(i)!=null){ tran.hide(fragments.get(i)); }
+        }
+
+        tran.show(fragments.get(num)).commit();
+    }
 
 }
 

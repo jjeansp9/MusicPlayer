@@ -48,4 +48,6 @@ dependencies {
     //implementation 'com.navercorp.nid:oauth-jdk8:5.4.0' // jdk 8 네이버 로그인
     implementation 'com.google.android.gms:play-services-auth:20.4.1' // 구글 로그인
 
+    implementation "androidx.media:media:1.6.0" // 미디어 플레이어를 사용하기 위한 라이브러리 (notification.mediastyle)
+
 }

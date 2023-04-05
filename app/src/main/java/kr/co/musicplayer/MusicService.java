@@ -1,6 +1,4 @@
-package kr.co.musicplayer.activities;
-
-import static androidx.constraintlayout.helper.widget.MotionEffect.TAG;
+package kr.co.musicplayer;
 
 import android.app.Service;
 import android.content.Intent;
@@ -8,21 +6,25 @@ import android.media.MediaPlayer;
 import android.os.Binder;
 import android.os.IBinder;
 import android.util.Log;
-import android.view.View;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
 
 import java.io.IOException;
 
+import kr.co.musicplayer.activities.MainActivity;
+
 public class MusicService extends Service {
 
-    MediaPlayer mp= new MediaPlayer();
+    private MediaPlayer mp= new MediaPlayer();
 
     @Override
     public void onCreate() {
         //서비스에서 가장 먼저 호출(최초한번)
         //mp.setLooping(false); // 반복재생
+
+        NotificationMediaStyle notificationMediaStyle= new NotificationMediaStyle();
+        notificationMediaStyle.craeteNotification(this);
 
         Log.d("Service onCreate", "onCreate");
         super.onCreate();
@@ -60,7 +62,9 @@ public class MusicService extends Service {
             }
         }).start();
 
-        Log.d("Service onStartCommand", "onStartCommand, " + processCommand(intent));
+        String data = intent.getStringExtra("pause");
+
+        Log.d("Service onStartCommand", "onStartCommand, " + processCommand(intent) + data);
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -86,6 +90,9 @@ public class MusicService extends Service {
         showIntent.putExtra("data", command);
         startActivity(showIntent); // Service에서 Activity로 데이터를 전달
 
+        String pause = intent.getStringExtra("pause");
+        Log.i("pauses", pause);
+
         return command;
     }
 
@@ -97,14 +104,14 @@ public class MusicService extends Service {
         return new MyBinder();
     }
 
-    class MyBinder extends Binder {
+    public class MyBinder extends Binder {
         // 이 MyService 객체의 주소값을 리턴해주는 기능함수
-        MusicService getMyServiceAddress(){
+        public MusicService getMyServiceAddress(){
             return MusicService.this;
         }
     }
 
-    protected void musicStart(){
+    public void musicStart(){
         mp.start();
         new Thread(new Runnable() {
             @Override
@@ -120,7 +127,7 @@ public class MusicService extends Service {
         }).start();
     }
 
-    protected void musicPause(){
+    public void musicPause(){
         mp.pause();
     }
 
