@@ -57,8 +57,10 @@ public class NotificationMediaStyle {
         Intent prevIntent = new Intent(context, MusicService.class);
         prevIntent.setAction("previous");
         //prevIntent.putExtra("music", "previous");
+
         Intent playPauseIntent = new Intent(context, MusicService.class);
         playPauseIntent.putExtra("music", "play");
+
         Intent nextIntent = new Intent(context, MusicService.class);
         nextIntent.putExtra("music", "next");
 

@@ -10,6 +10,7 @@ public class MyBroadcast extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals("PLAY")){
             Toast.makeText(context, "play", Toast.LENGTH_SHORT).show();
+
         }else if (intent.getAction().equals("PAUSE")){
             Toast.makeText(context, "no play", Toast.LENGTH_SHORT).show();
         }

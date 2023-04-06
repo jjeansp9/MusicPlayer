@@ -120,9 +120,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     }
 
-    private void updateUI(){
 
-    }
 
     @Override
     public void onBackPressed() {
