@@ -11,20 +11,23 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.ArrayList;
 
 import kr.co.musicplayer.activities.MainActivity;
+import kr.co.musicplayer.model.MediaFile;
 
 public class MusicService extends Service {
 
     private MediaPlayer mp= new MediaPlayer();
+    private NotificationMediaStyle notificationMediaStyle;
+
+    ArrayList<MediaFile> items= new ArrayList<>();
 
     @Override
     public void onCreate() {
         //서비스에서 가장 먼저 호출(최초한번)
         //mp.setLooping(false); // 반복재생
-
-        NotificationMediaStyle notificationMediaStyle= new NotificationMediaStyle();
-        notificationMediaStyle.craeteNotification(this);
 
         Log.d("Service onCreate", "onCreate");
         super.onCreate();
@@ -35,13 +38,21 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+
+        if (intent.getAction()!= null){
+            Log.i("getAction", intent.getAction());
+        }
+
         //서비스가 실행될 때 실행
         if (intent == null) return Service.START_STICKY;
         else processCommand(intent);
 
+        notificationMediaStyle= new NotificationMediaStyle();
+        notificationMediaStyle.craeteNotification(this, processCommand(intent).getArtist(),processCommand(intent).getTitle());
+
         try {
             mp.reset();
-            mp.setDataSource(processCommand(intent));
+            mp.setDataSource(processCommand(intent).getData());
             mp.prepare();
             mp.start();
 
@@ -62,6 +73,7 @@ public class MusicService extends Service {
             }
         }).start();
 
+
         String data = intent.getStringExtra("pause");
 
         Log.d("Service onStartCommand", "onStartCommand, " + processCommand(intent) + data);
@@ -78,8 +90,17 @@ public class MusicService extends Service {
         super.onDestroy();
     }
 
-    private String processCommand(Intent intent) {
-        String command = intent.getStringExtra("data");
+    private MediaFile processCommand(Intent intent) {
+
+        String data = intent.getStringExtra("data");
+        String title = intent.getStringExtra("title");
+        String artist = intent.getStringExtra("artist");
+
+        Log.e("processC??", data+title+artist);
+
+        if (items.size()==0) items.add(new MediaFile(data, artist, title, ""));
+        else items.set(0, new MediaFile(data, artist, title, ""));
+
 
         Intent showIntent = new Intent(getApplicationContext(), MainActivity.class);
 
@@ -87,13 +108,13 @@ public class MusicService extends Service {
                 Intent.FLAG_ACTIVITY_SINGLE_TOP |
                 Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-        showIntent.putExtra("data", command);
+        //showIntent.putExtra("data", command);
         startActivity(showIntent); // Service에서 Activity로 데이터를 전달
 
 //        String pause = intent.getStringExtra("pause");
 //        Log.i("pauses", pause);
 
-        return command;
+        return items.get(0);
     }
 
     // bindService()를 실행할 때 자동 발동하는 메소드
@@ -125,10 +146,43 @@ public class MusicService extends Service {
                 }
             }
         }).start();
+
+        sendBroadcast(new Intent("PLAY"));
+
     }
 
     public void musicPause(){
         mp.pause();
+
+        sendBroadcast(new Intent("PAUSE"));
+    }
+
+    public void musicPrevious(){
+
+    }
+
+    public void musicNext(){
+
     }
 
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

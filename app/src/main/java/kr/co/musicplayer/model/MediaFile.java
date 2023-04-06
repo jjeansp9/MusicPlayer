@@ -1,6 +1,11 @@
 package kr.co.musicplayer.model;
 
+import android.app.Application;
 import android.net.Uri;
+
+import java.io.Serializable;
+
+import kr.co.musicplayer.GlobalApplication;
 
 public class MediaFile {
 
