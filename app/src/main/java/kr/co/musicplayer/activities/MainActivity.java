@@ -221,6 +221,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             binding.play.setVisibility(View.INVISIBLE);
             binding.pause.setVisibility(View.VISIBLE);
 
+
         }else{
             Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
         }
@@ -232,6 +233,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         if (musicService!=null){
             musicService.musicPause();
+
             binding.play.setVisibility(View.VISIBLE);
             binding.pause.setVisibility(View.INVISIBLE);
         }

@@ -96,6 +96,7 @@ public class NotificationMediaStyle {
         if (num == 0) {
             builder.setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                     .setShowActionsInCompactView(0,2,3));
+
         }else if (num == 1){
             builder.setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
                     .setShowActionsInCompactView(0,1,3));
@@ -110,6 +111,7 @@ public class NotificationMediaStyle {
         // 매니저에게 알림(Notification)을 요청
         notificationManager.notify(1, notification);
     }
+
 
 }
 

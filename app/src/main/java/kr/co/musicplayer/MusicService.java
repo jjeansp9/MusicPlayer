@@ -39,20 +39,12 @@ public class MusicService extends Service {
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        String artist="";
-        String title="";
-
         if (intent.getAction()!= null){
             Log.i("getAction", intent.getAction());
 
-            if (intent.getAction().equals(NotificationMediaStyle.ACTION_PLAY)){
-                musicStart();
-                notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 0);
+            if (intent.getAction().equals(NotificationMediaStyle.ACTION_PLAY)) musicStart();
+            else if (intent.getAction().equals(NotificationMediaStyle.ACTION_PAUSE)) musicPause();
 
-            }else if (intent.getAction().equals(NotificationMediaStyle.ACTION_PAUSE)){
-                musicPause();
-                notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 1);
-            }
         }else{
             try {
                 mp.reset();
@@ -88,23 +80,6 @@ public class MusicService extends Service {
 //        if (intent == null) return Service.START_STICKY;
 //        else processCommand(intent);
 //
-
-        if (intent.getStringExtra("music")!=null){
-            String data = intent.getStringExtra("music");
-
-            if (data.equals("play")){
-
-                Log.e(">>>>>>>>>>>>>>>>", "musicplay");
-            }else if (data.equals("pause")){
-                musicPause();
-                Log.e("<<<<<<<<<<<<<<<", "musicpause");
-            }
-        }
-
-
-
-
-
 
         Log.d("Service onStartCommand", "onStartCommand, " + processCommand(intent));
 
@@ -160,7 +135,7 @@ public class MusicService extends Service {
         }
     }
 
-    public void musicStart(){
+    public String musicStart(){
         mp.start();
         new Thread(new Runnable() {
             @Override
@@ -176,13 +151,17 @@ public class MusicService extends Service {
         }).start();
 
         sendBroadcast(new Intent("PLAY"));
-
+        notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 0);
+        return "Start";
     }
 
-    public void musicPause(){
+    public String musicPause(){
         mp.pause();
 
         sendBroadcast(new Intent("PAUSE"));
+        notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 1);
+
+        return "Pause";
     }
 
     public void musicPrevious(){
