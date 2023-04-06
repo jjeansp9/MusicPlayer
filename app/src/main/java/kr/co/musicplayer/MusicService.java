@@ -23,60 +23,90 @@ public class MusicService extends Service {
     private NotificationMediaStyle notificationMediaStyle;
 
     ArrayList<MediaFile> items= new ArrayList<>();
+    MediaFile mediaFile= new MediaFile("", "", "", "");
 
     @Override
     public void onCreate() {
+        Intent intent= new Intent();
         //서비스에서 가장 먼저 호출(최초한번)
         //mp.setLooping(false); // 반복재생
-
+        notificationMediaStyle= new NotificationMediaStyle();
         Log.d("Service onCreate", "onCreate");
         super.onCreate();
     }
 
 
-
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
+        String artist="";
+        String title="";
 
         if (intent.getAction()!= null){
             Log.i("getAction", intent.getAction());
+
+            if (intent.getAction().equals(NotificationMediaStyle.ACTION_PLAY)){
+                musicStart();
+                notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 0);
+
+            }else if (intent.getAction().equals(NotificationMediaStyle.ACTION_PAUSE)){
+                musicPause();
+                notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 1);
+            }
+        }else{
+            try {
+                mp.reset();
+                mp.setDataSource(processCommand(intent).getData());
+                mp.prepare();
+                mp.start();
+
+                notificationMediaStyle.craeteNotification(this, processCommand(intent).getArtist(), processCommand(intent).getTitle(), 0);
+
+                mediaFile.setArtist(processCommand(intent).getArtist());
+                mediaFile.setTitle(processCommand(intent).getTitle());
+
+
+            } catch (IOException e) {
+                Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (mp.isPlaying()){
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
         }
 
         //서비스가 실행될 때 실행
-        if (intent == null) return Service.START_STICKY;
-        else processCommand(intent);
+//        if (intent == null) return Service.START_STICKY;
+//        else processCommand(intent);
+//
 
-        notificationMediaStyle= new NotificationMediaStyle();
-        notificationMediaStyle.craeteNotification(this, processCommand(intent).getArtist(),processCommand(intent).getTitle());
+        if (intent.getStringExtra("music")!=null){
+            String data = intent.getStringExtra("music");
 
-        try {
-            mp.reset();
-            mp.setDataSource(processCommand(intent).getData());
-            mp.prepare();
-            mp.start();
+            if (data.equals("play")){
 
-        } catch (IOException e) {
-            Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                Log.e(">>>>>>>>>>>>>>>>", "musicplay");
+            }else if (data.equals("pause")){
+                musicPause();
+                Log.e("<<<<<<<<<<<<<<<", "musicpause");
+            }
         }
 
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                while (mp.isPlaying()){
-                    try {
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-        }).start();
 
 
-        String data = intent.getStringExtra("pause");
 
-        Log.d("Service onStartCommand", "onStartCommand, " + processCommand(intent) + data);
+
+
+        Log.d("Service onStartCommand", "onStartCommand, " + processCommand(intent));
 
         return super.onStartCommand(intent, flags, startId);
     }
@@ -95,8 +125,6 @@ public class MusicService extends Service {
         String data = intent.getStringExtra("data");
         String title = intent.getStringExtra("title");
         String artist = intent.getStringExtra("artist");
-
-        Log.e("processC??", data+title+artist);
 
         if (items.size()==0) items.add(new MediaFile(data, artist, title, ""));
         else items.set(0, new MediaFile(data, artist, title, ""));

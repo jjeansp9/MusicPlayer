@@ -22,22 +22,29 @@ import kr.co.musicplayer.model.MediaFile;
 
 public class NotificationMediaStyle {
 
-    public void craeteNotification(Context context, String artist, String title){
+    NotificationCompat.Builder builder= null;
+    NotificationManager notificationManager;
+    NotificationChannel channel;
 
-        Log.e("???", artist+ title);
+    public static String ACTION_PLAY="PLAY";
+    public static String ACTION_PAUSE="PAUSE";
+    public static String ACTION_PREVIOUS="PREVIOUS";
+    public static String ACTION_NEXT="NEXT";
+
+    public void craeteNotification(Context context, String artist, String title, int num){
 
         // 운영체제로부터 알림(Notification)을 관리하는 관리자 객체 소환
-        NotificationManager notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         // Notification 객체를 생성해주는 Builder 객체 생성
-        NotificationCompat.Builder builder= null;
 
         Log.e("getSystem", context.getSystemService(Context.NOTIFICATION_SERVICE)+"");
 
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.O){ // 디바이스 버전이 26버전(Oreo버전) 이상이라면
 
             // 알림채널 객체 생성
-            NotificationChannel channel= new NotificationChannel("ch1", "My channel", NotificationManager.IMPORTANCE_LOW);
+            channel= new NotificationChannel("ch1", "My channel", NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(false);
+
 
 
             // 알림매니저에게 위 알림채널객체를 시스템에서 인식하도록 생성
@@ -55,18 +62,25 @@ public class NotificationMediaStyle {
         builder.setContentIntent(pendingIntent);
 
         Intent prevIntent = new Intent(context, MusicService.class);
-        prevIntent.setAction("previous");
+        prevIntent.setAction(ACTION_PREVIOUS);
         //prevIntent.putExtra("music", "previous");
 
-        Intent playPauseIntent = new Intent(context, MusicService.class);
-        playPauseIntent.putExtra("music", "play");
+        Intent playIntent = new Intent(context, MusicService.class);
+        playIntent.setAction(ACTION_PLAY);
+        //playIntent.putExtra("music", "play");
+
+        Intent pauseIntent = new Intent(context, MusicService.class);
+        pauseIntent.setAction(ACTION_PAUSE);
+        //pauseIntent.putExtra("music", "pause");
 
         Intent nextIntent = new Intent(context, MusicService.class);
-        nextIntent.putExtra("music", "next");
+        nextIntent.setAction(ACTION_NEXT);
+        //nextIntent.putExtra("music", "next");
 
         // 이전, 재생/일시정지, 다음 액션 PendingIntent 생성
         PendingIntent prevPendingIntent = PendingIntent.getService(context, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
-        PendingIntent playPausePendingIntent = PendingIntent.getService(context, 0, playPauseIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent playPendingIntent = PendingIntent.getService(context, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
+        PendingIntent pausePendingIntent = PendingIntent.getService(context, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         PendingIntent nextPendingIntent = PendingIntent.getService(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
 
         //Bitmap bm= BitmapFactory.decodeResource(getResources(), R.drawable.newyork);
@@ -75,10 +89,20 @@ public class NotificationMediaStyle {
                 .setContentTitle(title)
                 .setContentText(artist)
                 .addAction(R.drawable.ic_baseline_fast_rewind_24, "", prevPendingIntent) // #0
-                .addAction(R.drawable.ic_baseline_play_arrow_24, "Play/Pause", playPausePendingIntent)  // #1
-                .addAction(R.drawable.ic_baseline_fast_forward_24, "Next", nextPendingIntent)  // #2
-                .setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
-                        .setShowActionsInCompactView(0,1,2));
+                .addAction(R.drawable.ic_baseline_play_arrow_24, "Play", playPendingIntent)  // #1
+                .addAction(R.drawable.ic_baseline_pause_24, "pause", pausePendingIntent)  // #2
+                .addAction(R.drawable.ic_baseline_fast_forward_24, "Next", nextPendingIntent);  // #3
+
+        if (num == 0) {
+            builder.setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                    .setShowActionsInCompactView(0,2,3));
+        }else if (num == 1){
+            builder.setStyle(new androidx.media.app.NotificationCompat.MediaStyle()
+                    .setShowActionsInCompactView(0,1,3));
+        }
+
+
+
 
 
         Notification notification= builder.build();
@@ -86,4 +110,26 @@ public class NotificationMediaStyle {
         // 매니저에게 알림(Notification)을 요청
         notificationManager.notify(1, notification);
     }
+
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
