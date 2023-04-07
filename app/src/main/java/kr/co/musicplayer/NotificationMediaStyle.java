@@ -31,7 +31,7 @@ public class NotificationMediaStyle {
     public static String ACTION_PREVIOUS="PREVIOUS";
     public static String ACTION_NEXT="NEXT";
 
-    public void craeteNotification(Context context, String artist, String title, int num){
+    protected void craeteNotification(Context context, String artist, String title, int num){
 
         // 운영체제로부터 알림(Notification)을 관리하는 관리자 객체 소환
         notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -102,14 +102,17 @@ public class NotificationMediaStyle {
                     .setShowActionsInCompactView(0,1,3));
         }
 
-
-
-
-
         Notification notification= builder.build();
 
         // 매니저에게 알림(Notification)을 요청
         notificationManager.notify(1, notification);
+    }
+
+    protected void finishNotification(Context context){
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+
+        notificationManager.cancelAll();
+        builder= null;
     }
 
 

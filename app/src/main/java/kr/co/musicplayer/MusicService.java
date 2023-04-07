@@ -27,7 +27,6 @@ public class MusicService extends Service {
 
     @Override
     public void onCreate() {
-        Intent intent= new Intent();
         //서비스에서 가장 먼저 호출(최초한번)
         //mp.setLooping(false); // 반복재생
         notificationMediaStyle= new NotificationMediaStyle();
@@ -90,6 +89,7 @@ public class MusicService extends Service {
     public void onDestroy() {
         //서비스가 종료될 때 실행
         mp.stop(); //음악 종료
+        notificationMediaStyle.finishNotification(this);
 
         Log.d("Service onDestroy", "onDestroy");
         super.onDestroy();
