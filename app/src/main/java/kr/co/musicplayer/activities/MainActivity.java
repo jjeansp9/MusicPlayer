@@ -243,7 +243,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.musicArtist.setText(item.getArtist());
         binding.musicTitle.setText(item.getTitle());
     }
-
     // 유저정보를 불러오는 메소드
     private void getUserData(String[] loadUserInfo){
 

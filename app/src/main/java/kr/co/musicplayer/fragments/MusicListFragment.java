@@ -84,12 +84,6 @@ public class MusicListFragment extends Fragment {
         clickedItems();
     }
 
-//    @Override
-//    public void onResume() {
-//        Log.i("fragmentValue onResume", mParam1+", "+mParam2);
-//        super.onResume();
-//    }
-
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
