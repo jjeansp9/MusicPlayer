@@ -35,6 +35,7 @@
 
                 <action android:name="PLAY" />
                 <action android:name="PAUSE"/>
+                <action android:name="CUSTOM_ACTION"/>
 
             </intent-filter>
 

@@ -12,6 +12,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import androidx.drawerlayout.widget.DrawerLayout;
+
 import kr.co.musicplayer.activities.MainActivity;
 
 public class MyBroadcast extends BroadcastReceiver {
@@ -28,25 +30,23 @@ public class MyBroadcast extends BroadcastReceiver {
 
                 Toast.makeText(context, "play", Toast.LENGTH_SHORT).show();
 
-//                LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                RelativeLayout layout= (RelativeLayout) vi.inflate(R.layout.activity_main, null);
-//
-//                layout.findViewById(R.id.play).setVisibility(View.VISIBLE);
-//                layout.findViewById(R.id.pause).setVisibility(View.INVISIBLE);
+                // MainActivity 인스턴스 가져오기
+                MainActivity mainActivity = (MainActivity) context;
+                // View 조작하기
+                mainActivity.findViewById(R.id.play).setVisibility(View.INVISIBLE);
+                mainActivity.findViewById(R.id.pause).setVisibility(View.VISIBLE);
 
             }else if (intent.getAction().equals("PAUSE")){
 
                 Toast.makeText(context, "pause", Toast.LENGTH_SHORT).show();
 
-//                LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-//                RelativeLayout layout= (RelativeLayout) vi.inflate(R.layout.activity_main, null);
-//
-//                layout.findViewById(R.id.play).setVisibility(View.INVISIBLE);
-//                layout.findViewById(R.id.pause).setVisibility(View.VISIBLE);
+                // MainActivity 인스턴스 가져오기
+                MainActivity mainActivity = (MainActivity) context;
+                // View 조작하기
+                mainActivity.findViewById(R.id.play).setVisibility(View.VISIBLE);
+                mainActivity.findViewById(R.id.pause).setVisibility(View.INVISIBLE);
             }
         }
-
-
 
     }
 

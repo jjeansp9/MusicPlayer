@@ -54,11 +54,8 @@ public class User {
         this.image = image;
     }
 
-    private String loadPlatformId= null;
-    private String loadPlatform= null;
 
-
-    // 카카오,네이버,구글 중 아무거나 로그인하면 해당 메소드가 발동하여 디바이스에 ID값 저장
+    // 카카오,네이버,구글 중 아무거나 로그인하면 해당 메소드가 발동하여 디바이스에 ID, platform 값 저장
     public void saveUserId(Context context, String userId, String platform){
         SharedPreferences pref = context.getSharedPreferences("user", MODE_PRIVATE);
         SharedPreferences.Editor editor = pref.edit();
@@ -68,16 +65,27 @@ public class User {
         editor.commit();
     }
 
-    // 디바이스에 저장된 ID 값 가져오는 메소드
+
+
+    // 디바이스에 저장된 ID, platform 값 가져오는 메소드
     public String[] loadUserId(Context context){
         SharedPreferences pref= context.getSharedPreferences("user", MODE_PRIVATE);
-        loadPlatformId= pref.getString("id", loadPlatformId);
-        loadPlatform= pref.getString("platform", loadPlatform);
+        String loadPlatformId= pref.getString("id", null);
+        String loadPlatform= pref.getString("platform", null);
 
         String[] result= {loadPlatformId, loadPlatform};
 
         Log.i("User.class", "loadUserId() : "+loadPlatformId + ", " + loadPlatform);
         return result;
+    }
+
+    // 디바이스에 저장된 ID, platform 값 제거
+    public void removeUserId(Context context){
+        SharedPreferences preferences = context.getSharedPreferences("user", MODE_PRIVATE);
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.remove("id"); // 제거할 키 값 입력
+        editor.remove("platform"); // 제거할 키 값 입력
+        editor.apply();
     }
 }
 

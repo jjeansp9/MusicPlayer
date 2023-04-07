@@ -13,6 +13,7 @@ import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
+import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
@@ -44,8 +45,6 @@ public class NotificationMediaStyle {
             // 알림채널 객체 생성
             channel= new NotificationChannel("ch1", "My channel", NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(false);
-
-
 
             // 알림매니저에게 위 알림채널객체를 시스템에서 인식하도록 생성
             notificationManager.createNotificationChannel(channel);
@@ -108,9 +107,9 @@ public class NotificationMediaStyle {
         notificationManager.notify(1, notification);
     }
 
+    // notification 종료
     protected void finishNotification(Context context){
-        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-
+        notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
         builder= null;
     }

@@ -101,11 +101,8 @@ public class LoginActivity extends AppCompatActivity {
                 Toast.makeText(LoginActivity.this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show();
             }else{
                 kakaoUserInfo();
-                Toast.makeText(LoginActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
-                Log.d("kakaoToken", oAuthToken.getAccessToken());
 
-                startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                finish();
+                Log.d("kakaoToken", oAuthToken.getAccessToken());
             }
             return null;
         };
@@ -135,8 +132,10 @@ public class LoginActivity extends AppCompatActivity {
 
                     users.saveUserId(LoginActivity.this, Double.toString(user.getId()), "kakao");
 
-//                    Glide.with(LoginTestActivity.this).load(user.getKakaoAccount().getProfile().getProfileImageUrl()).into(binding.kakaoImage);
-//                    binding.kakaoName.setText(user.getKakaoAccount().getProfile().getNickname());
+                    startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                    finish();
+
+                    Toast.makeText(LoginActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
                 }
 
                 return null;
@@ -180,13 +179,6 @@ public class LoginActivity extends AppCompatActivity {
                         public void onSuccess(NidProfileResponse nidProfileResponse) {
 
                             naverInfo();
-
-                            startActivity(new Intent(LoginActivity.this, MainActivity.class));
-                            finish();
-
-//                            Glide.with(LoginActivity.this).load(nidProfileResponse.getProfile().getProfileImage()).into(binding.naverImage);
-//                            binding.naverName.setText(nidProfileResponse.getProfile().getNickname());
-                            Toast.makeText(LoginActivity.this, "네이버 로그인 성공", Toast.LENGTH_SHORT).show();
                         }
 
                         @Override
@@ -222,6 +214,9 @@ public class LoginActivity extends AppCompatActivity {
                 Log.i("naverInfo", "네이버 연령대 : " + nidProfileResponse.getProfile().getAge());
 
                 users.saveUserId(LoginActivity.this, nidProfileResponse.getProfile().getId(), "naver");
+
+                startActivity(new Intent(LoginActivity.this, MainActivity.class));
+                finish();
             }
 
             @Override
@@ -278,11 +273,6 @@ public class LoginActivity extends AppCompatActivity {
 
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
-
-
-
-//            Glide.with(this).load(account.getPhotoUrl()).into(binding.googleImage);
-//            binding.googleName.setText(account.getDisplayName());
 
             Toast.makeText(LoginActivity.this, "구글 로그인 완료", Toast.LENGTH_SHORT).show();
 
