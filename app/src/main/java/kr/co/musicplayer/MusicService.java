@@ -1,11 +1,15 @@
 package kr.co.musicplayer;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Binder;
+import android.os.Handler;
 import android.os.IBinder;
 import android.util.Log;
+import android.view.View;
+import android.widget.SeekBar;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -15,15 +19,24 @@ import java.io.Serializable;
 import java.util.ArrayList;
 
 import kr.co.musicplayer.activities.MainActivity;
+import kr.co.musicplayer.fragments.MusicInfoFragment;
 import kr.co.musicplayer.model.MediaFile;
 
-public class MusicService extends Service {
+public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener{
 
-    private MediaPlayer mp= new MediaPlayer();
+    public MediaPlayer mp= new MediaPlayer();
     private NotificationMediaStyle notificationMediaStyle;
 
     ArrayList<MediaFile> items= new ArrayList<>();
     MediaFile mediaFile= new MediaFile("", "", "", "");
+
+    private boolean isPrepared = false;
+    private Handler mHandler = new Handler();
+
+    // Fragment로부터 전달받은 SeekBar를 저장하는 변수
+    private SeekBar seekBar;
+
+
 
     @Override
     public void onCreate() {
@@ -33,7 +46,6 @@ public class MusicService extends Service {
         Log.d("Service onCreate", "onCreate");
         super.onCreate();
     }
-
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
@@ -56,10 +68,12 @@ public class MusicService extends Service {
                 mediaFile.setArtist(processCommand(intent).getArtist());
                 mediaFile.setTitle(processCommand(intent).getTitle());
 
-
+                sendBroadcast(new Intent("PLAY"));
             } catch (IOException e) {
                 Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
+
+
 
             new Thread(new Runnable() {
                 @Override
@@ -128,6 +142,16 @@ public class MusicService extends Service {
         return new MyBinder();
     }
 
+    @Override
+    public void onCompletion(MediaPlayer mediaPlayer) {
+
+    }
+
+    @Override
+    public void onPrepared(MediaPlayer mediaPlayer) {
+
+    }
+
     public class MyBinder extends Binder {
         // 이 MyService 객체의 주소값을 리턴해주는 기능함수
         public MusicService getMyServiceAddress(){
@@ -137,6 +161,7 @@ public class MusicService extends Service {
 
     public String musicStart(){
         mp.start();
+
         new Thread(new Runnable() {
             @Override
             public void run() {

@@ -3,8 +3,6 @@ package kr.co.musicplayer.activities;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 
 import android.content.ComponentName;
 import android.content.Intent;
@@ -234,7 +232,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
             binding.play.setVisibility(View.INVISIBLE);
             binding.pause.setVisibility(View.VISIBLE);
-
 
         }else{
             Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();

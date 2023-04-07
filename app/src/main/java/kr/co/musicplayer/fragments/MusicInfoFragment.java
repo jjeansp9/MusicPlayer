@@ -1,21 +1,33 @@
 package kr.co.musicplayer.fragments;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import kr.co.musicplayer.MusicService;
+import kr.co.musicplayer.R;
 import kr.co.musicplayer.databinding.FragmentMusicInfoBinding;
 import kr.co.musicplayer.model.MediaFile;
 
 public class MusicInfoFragment extends Fragment {
 
     private FragmentMusicInfoBinding binding;
+
+    protected MusicService musicService;
+    private boolean isServiceBound = false;
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
@@ -24,6 +36,8 @@ public class MusicInfoFragment extends Fragment {
     private String mParam1;
     private String mParam2;
     private String mParam3;
+
+    Intent intent;
 
     public static MusicInfoFragment newInstance(String param1, String param2, String param3) {
         MusicInfoFragment fragment = new MusicInfoFragment();
@@ -61,37 +75,75 @@ public class MusicInfoFragment extends Fragment {
         binding.musicComposer.setText(mParam2);
         binding.musicTitle.setText(mParam3);
 
+        Log.e("ggggg", musicService+"");
     }
 
+    // MusicService와 연결
+    ServiceConnection connection= new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MusicService.MyBinder binder = (MusicService.MyBinder) iBinder;
+            musicService = binder.getMyServiceAddress();
 
-//    private void seekBar(){
-//        mp= MediaPlayer.create(this, R.raw.beethoven_piano_sonata_01);
-//
-//        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
-//        binding.seekBar.setMax(mp.getDuration());
-//        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                if (fromUser){
-//                    mp.seekTo(progress);
-//                }
-//                int m= progress / 60000;
-//                int s= (progress % 60000) / 1000;
-//                String strTime = String.format("%02d:%02d", m, s);
-//                binding.text.setText(strTime);
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//            }
-//        });
-//    }
-//
-//     음악 재생
+            Log.e("ggggg", musicService+"");
+            seekBar();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
+
+    private void seekBar(){
+
+        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
+        binding.seekBar.setMax(musicService.mp.getDuration());
+
+        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser){
+                    musicService.mp.seekTo(progress);
+                }
+                int m= progress / 60000;
+                int s= (progress % 60000) / 1000;
+                String strTime = String.format("%02d:%02d", m, s);
+                binding.text.setText(strTime);
+
+                int ms= musicService.mp.getDuration() / 60000;
+                int ss= (musicService.mp.getDuration() % 60000) / 1000;
+                String strTimes = String.format("%02d:%02d", ms, ss);
+
+                binding.textMax.setText(strTimes);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+        });
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Intent intent = new Intent(getActivity(), MusicService.class);
+        getActivity().bindService(intent, connection, Context.BIND_AUTO_CREATE);
+    }
+
+    @Override
+    public void onStop() {
+        super.onStop();
+        if (isServiceBound) {
+            getActivity().unbindService(connection);
+            isServiceBound = false;
+        }
+    }
+
 //    private void musicPlay(){
 //        mp.start();
 //        new Thread(new Runnable() {
@@ -103,18 +155,12 @@ public class MusicInfoFragment extends Fragment {
 //                    } catch (InterruptedException e) {
 //                        e.printStackTrace();
 //                    }
-//                    binding.seekBar.setProgress(mp.getCurrentPosition());
+//
 //                }
 //            }
 //        }).start();
-//        binding.play.setVisibility(View.INVISIBLE);
-//        binding.pause.setVisibility(View.VISIBLE);
-//
-//        int m= mp.getDuration() / 60000;
-//        int s= (mp.getDuration() % 60000) / 1000;
-//        String strTime = String.format("%02d:%02d", m, s);
-//
-//        binding.textMax.setText(strTime);
+
+
 //    }
 
 }

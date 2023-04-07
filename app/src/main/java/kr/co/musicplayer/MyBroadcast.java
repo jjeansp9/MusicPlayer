@@ -13,12 +13,12 @@ import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.fragment.app.Fragment;
 
 import kr.co.musicplayer.activities.MainActivity;
+import kr.co.musicplayer.fragments.MusicInfoFragment;
 
 public class MyBroadcast extends BroadcastReceiver {
-
-
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -36,6 +36,7 @@ public class MyBroadcast extends BroadcastReceiver {
                 mainActivity.findViewById(R.id.play).setVisibility(View.INVISIBLE);
                 mainActivity.findViewById(R.id.pause).setVisibility(View.VISIBLE);
 
+
             }else if (intent.getAction().equals("PAUSE")){
 
                 Toast.makeText(context, "pause", Toast.LENGTH_SHORT).show();
@@ -49,6 +50,4 @@ public class MyBroadcast extends BroadcastReceiver {
         }
 
     }
-
-
 }
