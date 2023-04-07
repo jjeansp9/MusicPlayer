@@ -36,6 +36,25 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     // Fragment로부터 전달받은 SeekBar를 저장하는 변수
     private SeekBar seekBar;
 
+    // SeekBar를 설정하는 메소드
+    public void setSeekBar(SeekBar seekBar) {
+        this.seekBar = seekBar;
+        seekBar.setMax(mp.getDuration());
+        seekBar.setProgress(mp.getCurrentPosition());
+        mHandler.postDelayed(mUpdateTimeTask, 100);
+    }
+
+    // MediaPlayer의 재생 시간이 변경될 때마다 호출되는 Runnable 객체
+    private Runnable mUpdateTimeTask = new Runnable() {
+        public void run() {
+            if (mp != null && isPrepared) {
+                int currentPosition = mp.getCurrentPosition();
+                seekBar.setProgress(currentPosition);
+            }
+            mHandler.postDelayed(this, 100);
+        }
+    };
+
 
 
     @Override
@@ -72,8 +91,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             } catch (IOException e) {
                 Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
-
 
             new Thread(new Runnable() {
                 @Override
