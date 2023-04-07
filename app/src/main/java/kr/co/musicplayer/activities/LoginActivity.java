@@ -8,16 +8,19 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -54,11 +57,21 @@ public class LoginActivity extends AppCompatActivity {
     GoogleSignInClient mGoogleSignInClient;
     private int RC_SIGN_IN = 10;
 
-    User user=new User();
+    User users=new User();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+        String[] loadUserInfo= users.loadUserId(this);
+
+        // 디바이스에 저장된 ID값이 있다면 로그인화면을 생략하고 메인화면으로 이동
+        if (loadUserInfo[0] != null){
+            startActivity(new Intent(LoginActivity.this, MainActivity.class));
+            finish();
+        }
+
         binding= ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -75,6 +88,8 @@ public class LoginActivity extends AppCompatActivity {
 
         request();
     }
+
+
 
     // 카카오 로그인
     private void kakaoLogin(){
@@ -117,6 +132,8 @@ public class LoginActivity extends AppCompatActivity {
                     Log.i("kakaoLogin", "카카오 성별 : " + user.getKakaoAccount().getGender());
                     Log.i("kakaoLogin", "카카오 연령대 : " + user.getKakaoAccount().getAgeRange());
                     Log.i("kakaoLogin", "카카오 프로필사진 : " + user.getKakaoAccount().getProfile().getProfileImageUrl());
+
+                    users.saveUserId(LoginActivity.this, Double.toString(user.getId()), "kakao");
 
 //                    Glide.with(LoginTestActivity.this).load(user.getKakaoAccount().getProfile().getProfileImageUrl()).into(binding.kakaoImage);
 //                    binding.kakaoName.setText(user.getKakaoAccount().getProfile().getNickname());
@@ -162,6 +179,8 @@ public class LoginActivity extends AppCompatActivity {
                         @Override
                         public void onSuccess(NidProfileResponse nidProfileResponse) {
 
+                            naverInfo();
+
                             startActivity(new Intent(LoginActivity.this, MainActivity.class));
                             finish();
 
@@ -187,6 +206,38 @@ public class LoginActivity extends AppCompatActivity {
             }
         }
     });
+
+    // 네이버 회원정보
+    private void naverInfo(){
+
+        nidOAuthLogin.callProfileApi(new NidProfileCallback<NidProfileResponse>() {
+            @Override
+            public void onSuccess(NidProfileResponse nidProfileResponse) {
+
+                Log.i("naverInfo", "네이버 ID : " + nidProfileResponse.getProfile().getId());
+                Log.i("naverInfo", "네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname());
+                Log.i("naverInfo", "네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage());
+                Log.i("naverInfo", "네이버 이메일 : " + nidProfileResponse.getProfile().getEmail());
+                Log.i("naverInfo", "네이버 성별 : " + nidProfileResponse.getProfile().getGender());
+                Log.i("naverInfo", "네이버 연령대 : " + nidProfileResponse.getProfile().getAge());
+
+                users.saveUserId(LoginActivity.this, nidProfileResponse.getProfile().getId(), "naver");
+            }
+
+            @Override
+            public void onFailure(int i, @NonNull String s) {
+                Toast.makeText(LoginActivity.this, "로그인을 한 상태에서 확인이 가능합니다", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onError(int i, @NonNull String s) {
+                Toast.makeText(LoginActivity.this, "onError", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        Log.i("tokenTime", NaverIdLoginSDK.INSTANCE.getExpiresAt()+"");
+    }
+
 
     // 구글 로그인
     private void googleLogin(){
@@ -222,6 +273,8 @@ public class LoginActivity extends AppCompatActivity {
             Log.i("googleFamilyName", account.getFamilyName());
             Log.i("googlePhotoUrl", account.getPhotoUrl()+"");
 //            Log.i("googleLogin", account.getIdToken());
+
+            users.saveUserId(this, account.getId(), "google");
 
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();

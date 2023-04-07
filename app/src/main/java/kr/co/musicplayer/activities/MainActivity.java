@@ -1,25 +1,16 @@
 package kr.co.musicplayer.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.app.NotificationCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
-import android.app.Notification;
-import android.app.NotificationChannel;
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.BroadcastReceiver;
 import android.content.ComponentName;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.IBinder;
-import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -29,12 +20,14 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.kakao.sdk.user.UserApiClient;
 
 import java.util.ArrayList;
 
+import kotlin.Unit;
+import kotlin.jvm.functions.Function2;
 import kr.co.musicplayer.MusicService;
 import kr.co.musicplayer.MyBroadcast;
-import kr.co.musicplayer.NotificationMediaStyle;
 import kr.co.musicplayer.R;
 import kr.co.musicplayer.databinding.ActivityMainBinding;
 import kr.co.musicplayer.fragments.MusicInfoFragment;
@@ -58,7 +51,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private FragmentManager fragmentManager= null;
     private boolean[] result= {false,false};
 
-    private User user= new User();
+    private User users= new User();
 
     MusicService musicService;
     Intent intent;
@@ -255,28 +248,78 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.musicTitle.setText(item.getTitle());
     }
 
+    // 유저정보를 불러오는 메소드
     private void getUserData(){
 
-        // 구글로 로그인 한 회원의 정보 가져오기
-        GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
-        if (acct != null) {
-            user.setName(acct.getDisplayName());
-            user.setEmail(acct.getEmail());
-            user.setId(acct.getId());
-            user.setImage(acct.getPhotoUrl()+"");
-        }
+        String[] loadUserInfo= users.loadUserId(this);
+
+        if (loadUserInfo[0]!=null){
+
+            if (loadUserInfo[1].equals("kakao")){
+                UserApiClient.getInstance().me(new Function2<com.kakao.sdk.user.model.User, Throwable, Unit>() {
+                    @Override
+                    public Unit invoke(com.kakao.sdk.user.model.User user, Throwable throwable) {
+
+                        if (user != null) {
+                            setViewForUser(
+                                    user.getKakaoAccount().getProfile().getNickname(),
+                                    user.getKakaoAccount().getEmail(),
+                                    user.getKakaoAccount().getProfile().getProfileImageUrl()+"");
+                        }
+                        return null;
+                    }
+                });
+
+            }else if (loadUserInfo[1].equals("naver")){
+                UserApiClient.getInstance().me(new Function2<com.kakao.sdk.user.model.User, Throwable, Unit>() {
+                    @Override
+                    public Unit invoke(com.kakao.sdk.user.model.User user, Throwable throwable) {
+
+                        if (user != null) {
+                            setViewForUser(
+                                    user.getKakaoAccount().getProfile().getNickname(),
+                                    user.getKakaoAccount().getEmail(),
+                                    user.getKakaoAccount().getProfile().getProfileImageUrl());
+                        }
+
+                        return null;
+                    }
+                });
+
+            }else if (loadUserInfo[1].equals("google")){
+                // 구글로 로그인 한 회원의 정보 가져오기
+                GoogleSignInAccount acct = GoogleSignIn.getLastSignedInAccount(this);
+
+                if (acct != null) {
+                    setViewForUser(
+                            acct.getDisplayName(),
+                            acct.getEmail(),
+                            acct.getPhotoUrl()+"");
+                }
+            }
+        } // if ID값이 있다면
+
+    } // getUserData()
+
+
+    // View들의 상태를 설정하는 메소드
+    private void setViewForUser(String name, String email, String imageUrl){
+        users.setName(name);
+        users.setEmail(email);
+        users.setImage(imageUrl);
 
         userName= findViewById(R.id.user_name);
         userImage= findViewById(R.id.user_profile_image);
         userEmail= findViewById(R.id.user_email);
 
-        if (user.getImage().equals(""))Glide.with(this).load(user.getImage()).into(userImage);
-        else Glide.with(this).load(R.drawable.ic_baseline_account_circle_24).into(userImage);
+        if (users.getImage().equals("")) Glide.with(this).load(users.getImage()).into(userImage);
+        else Glide.with(this).load(imageUrl).into(userImage);
 
-
-        userName.setText(user.getName());
-        userEmail.setText(user.getEmail());
+        userName.setText(users.getName());
+        userEmail.setText(users.getEmail());
     }
+
+
 
 //    private void seekBar(){
 //        mp= MediaPlayer.create(this, R.raw.beethoven_piano_sonata_01);
