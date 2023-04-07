@@ -103,17 +103,17 @@
             android:id="@+id/un_link"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="회원 탈퇴하기"
-            android:textColor="#E34F4F"
-            android:textSize="16sp"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
             android:layout_marginBottom="16dp"
             android:background="@drawable/bg_box"
             android:paddingLeft="66dp"
-            android:paddingRight="66dp"
             android:paddingTop="12dp"
-            android:paddingBottom="12dp"/>
+            android:paddingRight="66dp"
+            android:paddingBottom="12dp"
+            android:text="회원 탈퇴하기"
+            android:textColor="#E34F4F"
+            android:textSize="16sp" />
 
     </RelativeLayout>
 

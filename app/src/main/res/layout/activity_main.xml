@@ -52,9 +52,9 @@
                         android:id="@+id/music_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="타이틀"
-                        android:textSize="14sp"
-                        android:textColor="@color/black"/>
+                        android:text=""
+                        android:textColor="@color/black"
+                        android:textSize="14sp" />
 
                     <TextView
                         android:id="@+id/music_artist"
@@ -62,7 +62,7 @@
                         android:layout_height="wrap_content"
                         android:layout_below="@id/music_title"
                         android:layout_marginTop="8dp"
-                        android:text="아티스트"
+                        android:text=""
                         android:textColor="@color/black"
                         android:textSize="12sp"
                         android:textStyle="bold" />

@@ -489,7 +489,6 @@ public class LoginTestActivity extends AppCompatActivity {
 
     private void googleInfo(){
 
-
         AlertDialog.Builder builder = new AlertDialog.Builder(LoginTestActivity.this);
         builder.setCancelable(true);
         builder.setTitle("회원정보");

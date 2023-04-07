@@ -1,5 +1,6 @@
 package kr.co.musicplayer.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -20,11 +21,18 @@ import android.widget.Toast;
 import com.bumptech.glide.Glide;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
+import com.google.android.gms.auth.api.signin.GoogleSignInClient;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.kakao.sdk.user.UserApiClient;
+import com.navercorp.nid.oauth.NidOAuthLogin;
+import com.navercorp.nid.oauth.OAuthLoginCallback;
 
 import java.util.ArrayList;
 
 import kotlin.Unit;
+import kotlin.jvm.functions.Function1;
 import kotlin.jvm.functions.Function2;
 import kr.co.musicplayer.MusicService;
 import kr.co.musicplayer.MyBroadcast;
@@ -80,16 +88,16 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //            }
 //        });
 
-        binding.list.setOnClickListener(v->clickedFragment(0));
-        binding.info.setOnClickListener(v->clickedFragment(1));
+        findViewById(R.id.un_link).setOnClickListener(v -> unLinkUser()); // 회원탈퇴 버튼
 
+        binding.list.setOnClickListener(v->clickedFragment(0)); // 음악리스트 화면으로 이동
+        binding.info.setOnClickListener(v->clickedFragment(1)); // 플레이중인 음악 정보를 보는 화면으로 이동
         //seekBar();
 
         binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
-
-        binding.playPrevious.setOnClickListener(v -> playPreviousMusic());
-        binding.playNext.setOnClickListener(v -> playNextMusic());
+        binding.playPrevious.setOnClickListener(v -> playPreviousMusic()); // 이전 음악 플레이
+        binding.playNext.setOnClickListener(v -> playNextMusic()); // 다음 음악 플레이
 
         registerBroadcast();
 
@@ -319,7 +327,81 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         userEmail.setText(users.getEmail());
     }
 
+    private void unLinkUser(){
 
+        // 카카오 탈퇴
+        UserApiClient.getInstance().unlink(new Function1<Throwable, Unit>() {
+            @Override
+            public Unit invoke(Throwable throwable) {
+
+                if (throwable != null){
+                    Log.e("kakaoUnlink", "카카오 회원탈퇴 실패", throwable);
+                    Toast.makeText(MainActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
+
+                }else{
+                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                    finish();
+                    Toast.makeText(MainActivity.this, "회원탈퇴 성공", Toast.LENGTH_SHORT).show();
+                    setViewForUser("이름", "이메일", "");
+                }
+
+                return null;
+            }
+        });
+
+        // 네이버 탈퇴
+        NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
+        nidOAuthLogin.callDeleteTokenApi(this, new OAuthLoginCallback() {
+            @Override
+            public void onSuccess() {
+                //서버에서 토큰 삭제에 성공한 상태입니다.
+                startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                finish();
+                setViewForUser("이름", "이메일", "");
+                Toast.makeText(MainActivity.this, "네이버 회원탈퇴 성공", Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(int i, @NonNull String s) {
+                // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
+                // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
+                Toast.makeText(MainActivity.this, "로그인을 한 상태에서 진행해주세요", Toast.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onError(int i, @NonNull String s) {
+                // 서버에서 토큰 삭제에 실패했어도 클라이언트에 있는 토큰은 삭제되어 로그아웃된 상태입니다.
+                // 클라이언트에 토큰 정보가 없기 때문에 추가로 처리할 수 있는 작업은 없습니다.
+                Toast.makeText(MainActivity.this, "네이버 회원탈퇴 에러", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // 구글 탈퇴
+
+        GoogleSignInClient mGoogleSignInClient;
+
+        GoogleSignInOptions gso= new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                .requestEmail()
+                .build();
+        mGoogleSignInClient= GoogleSignIn.getClient(this, gso);
+
+        mGoogleSignInClient.revokeAccess()
+                .addOnCompleteListener(this, new OnCompleteListener<Void>() {
+                    @Override
+                    public void onComplete(@NonNull Task<Void> task) {
+                        Toast.makeText(MainActivity.this, "구글 회원탈퇴 완료", Toast.LENGTH_SHORT).show();
+                        startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                        finish();
+                        setViewForUser("이름", "이메일", "");
+                    }
+                });
+        users.setAccount("");
+        users.setId("");
+        users.setEmail("");
+        users.setName("");
+        users.setImage("");
+    }
 
 //    private void seekBar(){
 //        mp= MediaPlayer.create(this, R.raw.beethoven_piano_sonata_01);
