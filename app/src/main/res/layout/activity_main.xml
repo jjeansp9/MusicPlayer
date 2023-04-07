@@ -15,78 +15,125 @@
             android:id="@+id/fragment_container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_above="@id/play_bar"/>
+            android:layout_above="@id/play_bar" />
 
         <RelativeLayout
             android:id="@+id/play_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
             android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:background="#ECECEC"
             android:paddingTop="12dp"
-            android:paddingBottom="12dp"
-            android:background="#ECECEC">
+            android:paddingBottom="12dp">
+
+            <RelativeLayout
+                android:id="@+id/info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content">
+
+                <ImageView
+                    android:id="@+id/music_image"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginLeft="8dp"
+                    android:padding="4dp"
+                    android:src="@drawable/ic_baseline_image_24" />
+
+                <RelativeLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerVertical="true"
+                    android:layout_toRightOf="@id/music_image"
+                    android:layout_marginLeft="8dp">
+
+                    <TextView
+                        android:id="@+id/music_title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="타이틀"
+                        android:textSize="14sp"
+                        android:textColor="@color/black"/>
+
+                    <TextView
+                        android:id="@+id/music_artist"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_below="@id/music_title"
+                        android:layout_marginTop="8dp"
+                        android:text="아티스트"
+                        android:textColor="@color/black"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                </RelativeLayout>
+
+
+            </RelativeLayout>
 
             <ImageView
                 android:id="@+id/list"
                 android:layout_width="50dp"
                 android:layout_height="50dp"
+                android:layout_centerVertical="true"
                 android:layout_marginLeft="8dp"
+                android:padding="4dp"
                 android:src="@drawable/ic_baseline_playlist_play_24"
-                android:layout_centerVertical="true"
-                android:visibility="invisible"
-                android:padding="4dp"/>
+                android:visibility="invisible" />
 
-            <ImageView
-                android:id="@+id/info"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_centerVertical="true"
-                android:layout_marginLeft="8dp"
-                android:src="@drawable/ic_baseline_image_24"
-                android:padding="4dp"/>
 
-            <ImageView
-                android:id="@+id/play"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:text="재생"
-                android:src="@drawable/ic_baseline_play_arrow_24"
-                android:layout_centerHorizontal="true"/>
+            <RelativeLayout
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true">
 
-            <ImageView
-                android:id="@+id/pause"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_baseline_pause_24"
-                android:text="일시정지"
-                android:visibility="invisible"
-                android:layout_centerHorizontal="true"/>
+                <ImageView
+                    android:id="@+id/play"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerHorizontal="true"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_baseline_play_arrow_24"
+                    android:text="재생" />
 
-            <ImageView
-                android:id="@+id/play_previous"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:layout_marginRight="30dp"
-                android:layout_toLeftOf="@id/play"
-                android:src="@drawable/ic_baseline_fast_rewind_24" />
+                <ImageView
+                    android:id="@+id/pause"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_centerHorizontal="true"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_baseline_pause_24"
+                    android:text="일시정지"
+                    android:visibility="invisible" />
 
-            <ImageView
-                android:id="@+id/play_next"
-                android:layout_width="50dp"
-                android:layout_height="50dp"
-                android:src="@drawable/ic_baseline_fast_forward_24"
-                android:layout_toRightOf="@id/play"
-                android:layout_marginLeft="30dp"/>
+                <ImageView
+                    android:id="@+id/play_previous"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_toLeftOf="@id/play"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_baseline_fast_rewind_24" />
 
-<!--            <ImageView-->
-<!--                android:id="@+id/add_music"-->
-<!--                android:layout_width="40dp"-->
-<!--                android:layout_height="40dp"-->
-<!--                android:layout_alignParentRight="true"-->
-<!--                android:layout_centerVertical="true"-->
-<!--                android:layout_marginRight="8dp"-->
-<!--                android:src="@drawable/ic_baseline_playlist_add_24" />-->
+                <ImageView
+                    android:id="@+id/play_next"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_toRightOf="@id/play"
+                    android:padding="6dp"
+                    android:src="@drawable/ic_baseline_fast_forward_24" />
+
+            </RelativeLayout>
+
+
+            <!--            <ImageView-->
+            <!--                android:id="@+id/add_music"-->
+            <!--                android:layout_width="40dp"-->
+            <!--                android:layout_height="40dp"-->
+            <!--                android:layout_alignParentRight="true"-->
+            <!--                android:layout_centerVertical="true"-->
+            <!--                android:layout_marginRight="8dp"-->
+            <!--                android:src="@drawable/ic_baseline_playlist_add_24" />-->
 
         </RelativeLayout>
 

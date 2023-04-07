@@ -251,6 +251,8 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
 
+        binding.musicArtist.setText(item.getArtist());
+        binding.musicTitle.setText(item.getTitle());
     }
 
     private void getUserData(){
