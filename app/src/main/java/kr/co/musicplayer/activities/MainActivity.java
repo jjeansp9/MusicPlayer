@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //    View navBar;
 
     private ArrayList<Fragment> fragments= new ArrayList<>();
-    private FragmentManager fragmentManager= null;
+    private FragmentManager fragmentManager;
     private boolean[] result= {false,false};
 
     private NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
@@ -84,7 +84,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         intent = new Intent(getApplicationContext(), MusicService.class);
 
         getUserData(loadUserInfo);
-        createFragment();
 
         myBroadcast= new MyBroadcast();
 
@@ -98,8 +97,17 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         findViewById(R.id.un_link).setOnClickListener(v -> unLinkUser(loadUserInfo)); // 회원탈퇴 버튼
 
-        binding.list.setOnClickListener(v->clickedFragment(0)); // 음악리스트 화면으로 이동
-        binding.info.setOnClickListener(v->clickedFragment(1)); // 플레이중인 음악 정보를 보는 화면으로 이동
+        binding.list.setOnClickListener(v->{
+
+            fragmentManager= getSupportFragmentManager();
+            getSupportFragmentManager()
+                    .beginTransaction()
+                    .replace(R.id.fragment_container, MusicListFragment.newInstance("position", 20), "position")
+                    .commit();
+        }); // 음악리스트 화면으로 이동
+
+        binding.info.setOnClickListener(v-> showFragment() ); // 플레이중인 음악 정보를 보는 화면으로 이동
+
         //seekBar();
 
         binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
@@ -109,16 +117,15 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         registerBroadcast();
 
-
-        // 프래그먼트 추가
-//        FragmentManager fragmentManager = getSupportFragmentManager();
-//        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-//        fragmentTransaction.add(R.id.fragment, new MusicListFragment());
-//        fragmentTransaction.add(R.id.fragment, new MusicInfoFragment());
-//        fragmentTransaction.commit();
-
-
     } // onCreate()
+
+    private void showFragment(){
+        fragmentManager= getSupportFragmentManager();
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, MusicInfoFragment.newInstance("position", 10), "position")
+                .commit();
+    }
 
     private void registerBroadcast() {
 
@@ -185,17 +192,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         //getDataFromService(intent);
 
         super.onNewIntent(intent);
-    }
-
-
-    // 플레이중인 음악의 이전 음악 플레이하기
-    private void playPreviousMusic(){
-
-        // 프래그먼트로 데이터 전달
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, MusicListFragment.newInstance("position", position), "position")
-                .commit();
     }
 
     // 플레이중인 음악의 다음 음악 플레이하기
@@ -477,6 +473,16 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         }
 
         tran.show(fragments.get(num)).commit();
+    }
+
+    // 플레이중인 음악의 이전 음악 플레이하기
+    private void playPreviousMusic(){
+
+        // 프래그먼트로 데이터 전달
+        getSupportFragmentManager()
+                .beginTransaction()
+                .replace(R.id.fragment_container, MusicListFragment.newInstance("position", position), "position")
+                .commit();
     }
 
 }

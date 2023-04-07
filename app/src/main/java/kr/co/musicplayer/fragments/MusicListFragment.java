@@ -38,7 +38,7 @@ public class MusicListFragment extends Fragment {
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
 
-    private String mParam1="";
+    private String mParam1;
     private int mParam2;
 
     public static MusicListFragment newInstance(String param1, int param2) {
@@ -47,6 +47,7 @@ public class MusicListFragment extends Fragment {
         args.putString(ARG_PARAM1, param1);
         args.putInt(ARG_PARAM2, param2);
         fragment.setArguments(args);
+
         return fragment;
     }
 
@@ -78,7 +79,7 @@ public class MusicListFragment extends Fragment {
         binding.recycler.setAdapter(adapter);
         binding.recycler.addItemDecoration(new DividerItemDecoration(requireActivity(), LinearLayout.VERTICAL));
 
-        Log.i("fragmentValue onViewCreated", mParam1+", "+mParam2);
+        Log.i("MusicListFragment onViewCreated", "MusicListFragment onViewCreated : " + mParam1+", "+mParam2);
 
         getMusic();
         clickedItems();
