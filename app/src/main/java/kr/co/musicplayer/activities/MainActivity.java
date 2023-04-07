@@ -54,12 +54,10 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private ImageView userImage;
     private TextView userEmail;
 
+    private MediaFile mMediaFile= new MediaFile("","","","");
+
     //    private DrawerLayout drawerLayout;
 //    View navBar;
-
-    private ArrayList<Fragment> fragments= new ArrayList<>();
-    private FragmentManager fragmentManager;
-    private boolean[] result= {false,false};
 
     private NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
 
@@ -76,7 +74,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        String[] loadUserInfo= users.loadUserId(this);
+        String[] loadUserInfo= users.loadUserId(this); // 디바이스에 저장된 유저데이터 가져오기
 
         binding= ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -87,26 +85,24 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         myBroadcast= new MyBroadcast();
 
-//        userName= findViewById(R.id.user_name);
-//        userName.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View view) {
-//                userName.setText("ffff");
-//            }
-//        });
+        userName= findViewById(R.id.user_name);
+        userName.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                userName.setText("ffff");
+            }
+        });
+
+        showFragment(MusicListFragment.newInstance("position", 20), 0);
 
         findViewById(R.id.un_link).setOnClickListener(v -> unLinkUser(loadUserInfo)); // 회원탈퇴 버튼
 
-        binding.list.setOnClickListener(v->{
 
-            fragmentManager= getSupportFragmentManager();
-            getSupportFragmentManager()
-                    .beginTransaction()
-                    .replace(R.id.fragment_container, MusicListFragment.newInstance("position", 20), "position")
-                    .commit();
-        }); // 음악리스트 화면으로 이동
+        // 음악리스트 화면으로 이동
+        binding.list.setOnClickListener(v-> showFragment(MusicListFragment.newInstance("position", 20), 0));
 
-        binding.info.setOnClickListener(v-> showFragment() ); // 플레이중인 음악 정보를 보는 화면으로 이동
+        // 플레이중인 음악 정보를 보는 화면으로 이동
+        binding.info.setOnClickListener(v-> showFragment(MusicInfoFragment.newInstance("position", "", ""), 1));
 
         //seekBar();
 
@@ -119,11 +115,44 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     } // onCreate()
 
-    private void showFragment(){
-        fragmentManager= getSupportFragmentManager();
+    // Fragment에서 넘긴 데이터 받아오는 메소드
+    @Override
+    public void onDataPass(MediaFile item, int position) {
+
+        mMediaFile = item;
+
+        putDataToService(item);
+        this.position = position;
+
+        binding.play.setVisibility(View.INVISIBLE);
+        binding.pause.setVisibility(View.VISIBLE);
+
+        binding.musicArtist.setText(item.getArtist());
+        binding.musicTitle.setText(item.getTitle());
+
+    }
+
+    // 클릭한 버튼마다 각각의 프래그먼트 보여주기
+    private void showFragment(Fragment fragment, int num){
+
+        if (num==0) {
+            binding.list.setVisibility(View.INVISIBLE);
+            binding.musicImage.setVisibility(View.VISIBLE);
+
+        }else{
+            // 프래그먼트에서 전달받은 데이터를 가져옴
+            Bundle bundle = getIntent().getExtras();
+            if (bundle != null) mMediaFile = bundle.getParcelable("mediaFile");
+
+            fragment= MusicInfoFragment.newInstance("position", mMediaFile.getArtist(), mMediaFile.getTitle());
+
+            binding.list.setVisibility(View.VISIBLE);
+            binding.musicImage.setVisibility(View.INVISIBLE);
+        }
+
         getSupportFragmentManager()
                 .beginTransaction()
-                .replace(R.id.fragment_container, MusicInfoFragment.newInstance("position", 10), "position")
+                .replace(R.id.fragment_container, fragment, "position")
                 .commit();
     }
 
@@ -181,8 +210,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             intent.putExtra("artist", item.getArtist());
             startService(intent);
 
-
-
         }
     }
 
@@ -225,20 +252,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         }
     }
 
-
-    // Fragment에서 넘긴 데이터 받아오는 메소드
-    @Override
-    public void onDataPass(MediaFile item, int position) {
-
-        putDataToService(item);
-        this.position = position;
-
-        binding.play.setVisibility(View.INVISIBLE);
-        binding.pause.setVisibility(View.VISIBLE);
-
-        binding.musicArtist.setText(item.getArtist());
-        binding.musicTitle.setText(item.getTitle());
-    }
     // 유저정보를 불러오는 메소드
     private void getUserData(String[] loadUserInfo){
 
@@ -302,13 +315,12 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         users.setEmail(email);
         users.setImage(imageUrl);
 
-        Log.e("urls",imageUrl);
-
         userName= findViewById(R.id.user_name);
         userImage= findViewById(R.id.user_profile_image);
         userEmail= findViewById(R.id.user_email);
 
         if (users.getImage().equals("") || users.getImage().equals("null")) Glide.with(this).load(R.drawable.ic_baseline_account_circle_24).into(userImage);
+
         else Glide.with(this).load(imageUrl).into(userImage);
 
         userName.setText(users.getName());
@@ -442,38 +454,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 //        binding.textMax.setText(strTime);
 //    }
 
-    private void createFragment(){
-        fragments.add(0, new MusicListFragment());
-        fragments.add(1, new MusicInfoFragment());
-
-        fragmentManager= getSupportFragmentManager();
-        fragmentManager.beginTransaction().add(R.id.fragment_container, fragments.get(0)).commit();
-        result[0]= true;
-    }
-
-    private void clickedFragment(int num){
-
-        if (num==0){
-            binding.info.setVisibility(View.VISIBLE);
-            binding.list.setVisibility(View.INVISIBLE);
-        }else{
-            binding.info.setVisibility(View.INVISIBLE);
-            binding.list.setVisibility(View.VISIBLE);
-        }
-
-        FragmentTransaction tran= fragmentManager.beginTransaction();
-
-        if (!result[1]){
-            tran.add(R.id.fragment_container, fragments.get(1));
-            result[1] = true;
-        }
-
-        for (int i=0; i<fragments.size(); i++){
-            if (fragments.get(i)!=null){ tran.hide(fragments.get(i)); }
-        }
-
-        tran.show(fragments.get(num)).commit();
-    }
 
     // 플레이중인 음악의 이전 음악 플레이하기
     private void playPreviousMusic(){

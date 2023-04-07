@@ -12,7 +12,6 @@ import androidx.fragment.app.Fragment;
 
 import kr.co.musicplayer.databinding.FragmentMusicInfoBinding;
 import kr.co.musicplayer.model.MediaFile;
-import kr.co.musicplayer.model.OnDataPass;
 
 public class MusicInfoFragment extends Fragment {
 
@@ -20,15 +19,18 @@ public class MusicInfoFragment extends Fragment {
 
     private static final String ARG_PARAM1 = "param1";
     private static final String ARG_PARAM2 = "param2";
+    private static final String ARG_PARAM3 = "param3";
 
     private String mParam1;
-    private int mParam2;
+    private String mParam2;
+    private String mParam3;
 
-    public static MusicInfoFragment newInstance(String param1, int param2) {
+    public static MusicInfoFragment newInstance(String param1, String param2, String param3) {
         MusicInfoFragment fragment = new MusicInfoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
-        args.putInt(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM2, param2);
+        args.putString(ARG_PARAM3, param3);
         fragment.setArguments(args);
 
         return fragment;
@@ -39,7 +41,8 @@ public class MusicInfoFragment extends Fragment {
         super.onCreate(savedInstanceState);
         if (getArguments() != null) {
             mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getInt(ARG_PARAM2);
+            mParam2 = getArguments().getString(ARG_PARAM2);
+            mParam3 = getArguments().getString(ARG_PARAM3);
         }
     }
 
@@ -55,21 +58,63 @@ public class MusicInfoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Log.i("MusicInfoFragment onViewCreated", "MusicInfoFragment onViewCreated : " + mParam1+", "+mParam2);
+        binding.musicComposer.setText(mParam2);
+        binding.musicTitle.setText(mParam3);
 
     }
 
-    OnDataPass onDataPass= new OnDataPass() {
-        @Override
-        public void onDataPass(MediaFile item, int position) {
 
-            getData(item);
-        }
-    };
-
-    public MediaFile getData(MediaFile item){
-
-        return item;
-    }
-
+//    private void seekBar(){
+//        mp= MediaPlayer.create(this, R.raw.beethoven_piano_sonata_01);
+//
+//        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
+//        binding.seekBar.setMax(mp.getDuration());
+//        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+//            @Override
+//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+//                if (fromUser){
+//                    mp.seekTo(progress);
+//                }
+//                int m= progress / 60000;
+//                int s= (progress % 60000) / 1000;
+//                String strTime = String.format("%02d:%02d", m, s);
+//                binding.text.setText(strTime);
+//            }
+//
+//            @Override
+//            public void onStartTrackingTouch(SeekBar seekBar) {
+//            }
+//
+//            @Override
+//            public void onStopTrackingTouch(SeekBar seekBar) {
+//            }
+//        });
+//    }
+//
+//     음악 재생
+//    private void musicPlay(){
+//        mp.start();
+//        new Thread(new Runnable() {
+//            @Override
+//            public void run() {
+//                while (mp.isPlaying()){
+//                    try {
+//                        Thread.sleep(1000);
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//                    binding.seekBar.setProgress(mp.getCurrentPosition());
+//                }
+//            }
+//        }).start();
+//        binding.play.setVisibility(View.INVISIBLE);
+//        binding.pause.setVisibility(View.VISIBLE);
+//
+//        int m= mp.getDuration() / 60000;
+//        int s= (mp.getDuration() % 60000) / 1000;
+//        String strTime = String.format("%02d:%02d", m, s);
+//
+//        binding.textMax.setText(strTime);
+//    }
 
 }
