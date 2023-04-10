@@ -2,12 +2,14 @@ package kr.co.musicplayer.model;
 
 import android.app.Application;
 import android.net.Uri;
+import android.os.Parcel;
+import android.os.Parcelable;
 
 import java.io.Serializable;
 
 import kr.co.musicplayer.GlobalApplication;
 
-public class MediaFile {
+public class MediaFile implements Parcelable {
 
     String data;
     String artist;
@@ -52,6 +54,39 @@ public class MediaFile {
     public void setDuration(String duration) {
         this.duration = duration;
     }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel parcel, int i) {
+        parcel.writeString(data);
+        parcel.writeString(artist);
+        parcel.writeString(title);
+        parcel.writeString(duration);
+    }
+
+    protected MediaFile(Parcel in) {
+        data = in.readString();
+        artist = in.readString();
+        title = in.readString();
+        duration = in.readString();
+    }
+
+    public static final Creator<MediaFile> CREATOR = new Creator<MediaFile>() {
+        @Override
+        public MediaFile createFromParcel(Parcel in) {
+            return new MediaFile(in);
+        }
+
+        @Override
+        public MediaFile[] newArray(int size) {
+            return new MediaFile[size];
+        }
+    };
+
 }
 
 

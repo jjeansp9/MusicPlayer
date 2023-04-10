@@ -152,7 +152,7 @@ public class MusicListFragment extends Fragment {
 
     // 액티비티로 데이터 넘겨주는 메소드
     public void passData(MediaFile item, int position){
-        dataPass.onDataPass(item, position, items.size());
+        dataPass.onDataPass(item, position, items.size(), items);
     }
 }
 

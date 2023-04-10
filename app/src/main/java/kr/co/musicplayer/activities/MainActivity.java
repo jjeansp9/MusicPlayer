@@ -56,6 +56,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private TextView userEmail;
 
     private MediaFile mMediaFile= new MediaFile("","","","");
+    private ArrayList<MediaFile> items= new ArrayList<>();
 
     //    private DrawerLayout drawerLayout;
 //    View navBar;
@@ -104,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         // 플레이중인 음악 정보를 보는 화면으로 이동
         binding.info.setOnClickListener(v-> showFragment(MusicInfoFragment.newInstance(
-                "position", mMediaFile.getArtist(), mMediaFile.getTitle(), musicService.mp.getDuration(), musicService.mp.getCurrentPosition()), 1));
+                "position", mMediaFile.getArtist(), mMediaFile.getTitle(), musicService.mp.getDuration(), musicService.mp.getCurrentPosition(), musicNumber, items), 1));
 
         //seekBar();
 
@@ -119,13 +120,14 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     // Fragment에서 넘긴 데이터 받아오는 메소드
     @Override
-    public void onDataPass(MediaFile item, int position, int itemsNumber) {
+    public void onDataPass(MediaFile item, int position, int itemsNumber, ArrayList<MediaFile> items) {
 
         mMediaFile = item;
+        this.items= items;
+        this.position = position;
 
         putDataToService(item);
-        this.position = position;
-        Log.i("MainActivity", "onDataPass() : " +position);
+        Log.i("MainActivity", "onDataPass() : " +position + ", items : " + items.size());
 
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
@@ -181,10 +183,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             binding.musicImage.setVisibility(View.VISIBLE);
 
         }else{
-            // 프래그먼트에서 전달받은 데이터를 가져옴
-            Bundle bundle = getIntent().getExtras();
-            if (bundle != null) mMediaFile = bundle.getParcelable("mediaFile");
-
             binding.list.setVisibility(View.VISIBLE);
             binding.musicImage.setVisibility(View.INVISIBLE);
         }
@@ -471,22 +469,34 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                 Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
             }
         }
-
-
-
     }
 
     public void playNextMusic(){
-        MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        //MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        MusicInfoFragment musicInfoFragment= (MusicInfoFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
         Log.i("positions", position+"");
-        if (musicListFragment!=null){
+//        if (musicListFragment!=null){
+//
+//            if (musicService!=null){
+//                if (position+1 ==  musicNumber){
+//                    musicListFragment.clickedPreviousOrNext(0);
+//                }else{
+//                    musicListFragment.clickedPreviousOrNext(position+1);
+//                }
+//
+//            }else{
+//                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+//            }
+//        }
+
+        if (musicInfoFragment!=null){
 
             if (musicService!=null){
                 if (position+1 ==  musicNumber){
-                    musicListFragment.clickedPreviousOrNext(0);
+                    musicInfoFragment.clickedPreviousOrNext(0);
                 }else{
-                    musicListFragment.clickedPreviousOrNext(position+1);
+                    musicInfoFragment.clickedPreviousOrNext(position+1);
                 }
 
             }else{
