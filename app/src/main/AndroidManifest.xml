@@ -37,6 +37,8 @@
                 <action android:name="PAUSE"/>
                 <action android:name="PREVIOUS"/>
                 <action android:name="NEXT"/>
+                <action android:name="UPDATE_PROGRESS"/>
+
 
             </intent-filter>
 

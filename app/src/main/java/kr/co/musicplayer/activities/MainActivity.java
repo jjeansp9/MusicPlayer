@@ -400,60 +400,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         Toast.makeText(MainActivity.this, "회원탈퇴 성공", Toast.LENGTH_SHORT).show();
     }
 
-//    private void seekBar(){
-//        mp= MediaPlayer.create(this, R.raw.beethoven_piano_sonata_01);
-//
-//        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
-//        binding.seekBar.setMax(mp.getDuration());
-//        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                if (fromUser){
-//                    mp.seekTo(progress);
-//                }
-//                int m= progress / 60000;
-//                int s= (progress % 60000) / 1000;
-//                String strTime = String.format("%02d:%02d", m, s);
-//                binding.text.setText(strTime);
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//            }
-//        });
-//    }
-
-    // 음악 재생
-//    private void musicPlay(){
-//        mp.start();
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                while (mp.isPlaying()){
-//                    try {
-//                        Thread.sleep(1000);
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//                    binding.seekBar.setProgress(mp.getCurrentPosition());
-//                }
-//            }
-//        }).start();
-//        binding.play.setVisibility(View.INVISIBLE);
-//        binding.pause.setVisibility(View.VISIBLE);
-//
-//        int m= mp.getDuration() / 60000;
-//        int s= (mp.getDuration() % 60000) / 1000;
-//        String strTime = String.format("%02d:%02d", m, s);
-//
-//        binding.textMax.setText(strTime);
-//    }
-
-
     // 플레이중인 음악의 이전 음악 플레이하기
     public void playPreviousMusic(){
         Log.i("MainActivity", "playPreviousMusic() : " +position + ", " + musicNumber);
@@ -490,12 +436,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             }
         }
 
-
     }
 
     public void playNextMusic(){
-
-
 
         if (getFragmentNum==0){
             MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
@@ -530,10 +473,15 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                 }
             }
         }
+    }
 
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
 
-
-
+        if (connection != null) {
+            unbindService(connection);
+        }
     }
 
 }

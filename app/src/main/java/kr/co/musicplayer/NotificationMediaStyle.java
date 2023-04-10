@@ -111,9 +111,7 @@ public class NotificationMediaStyle {
     protected void finishNotification(Context context){
         notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
         notificationManager.cancelAll();
-        builder= null;
     }
-
 
 }
 

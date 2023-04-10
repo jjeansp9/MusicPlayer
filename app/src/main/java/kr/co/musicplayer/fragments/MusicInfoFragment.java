@@ -1,10 +1,15 @@
 package kr.co.musicplayer.fragments;
 
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.IBinder;
 import android.os.Parcelable;
 import android.util.Log;
@@ -31,7 +36,6 @@ public class MusicInfoFragment extends Fragment {
     private FragmentMusicInfoBinding binding;
 
     protected MusicService musicService;
-    private boolean isServiceBound = false;
 
     private OnDataPass dataPass;
 
@@ -50,6 +54,17 @@ public class MusicInfoFragment extends Fragment {
     private int musicCurrentDuration;
     private int musicNumber;
     private ArrayList<MediaFile> items= new ArrayList<>();
+
+    private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            int progress = intent.getIntExtra("progress", 0);
+            Log.i("Progresss", progress+"");
+            binding.seekBar.setProgress(progress);
+
+        }
+    };
+
 
 
     public static MusicInfoFragment newInstance(String param1, String param2, String param3, int param4, int param5, int param6, ArrayList<MediaFile> items) {
@@ -102,13 +117,49 @@ public class MusicInfoFragment extends Fragment {
         String strTime = String.format("%01d:%02d", m, s);
 
         binding.playTimeMax.setText(strTime);
+
+        seekBar();
+
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        IntentFilter filter = new IntentFilter("MEDIA_PLAYER_PROGRESS");
+        filter.addAction("UPDATE_PROGRESS");
+        getActivity().registerReceiver(broadcastReceiver, filter);
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        getActivity().unregisterReceiver(broadcastReceiver);
     }
 
     @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
+
         dataPass= (OnDataPass) context;
+
+        // Service와 바인딩하여 Service 객체 가져오기
+        Intent intent = new Intent(getActivity(), MusicService.class);
+        getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
+
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName name, IBinder service) {
+            MusicService.MyBinder binder = (MusicService.MyBinder) service;
+            musicService = binder.getMyServiceAddress();
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName name) {
+            musicService = null;
+        }
+    };
 
     public void clickedPreviousOrNext(int position){
         Log.i("MusicListFragment", "clickedPrevious() : " +position);
@@ -125,48 +176,45 @@ public class MusicInfoFragment extends Fragment {
         dataPass.onDataPass(item, position, items.size(), items);
     }
 
-//    @Override
-//    public void onAttach(@NonNull Context context) {
-//        super.onAttach(context);
-//        dataPass= (OnDataPass) context;
-//    }
 
-//    public void clickedPreviousOrNext(int position){
-//        Log.i("MusicListFragment", "clickedPrevious() : " +position);
-//        passData(items.get(position), position);
-//    }
-//
-//    // 액티비티로 데이터 넘겨주는 메소드
-//    public void passData(MediaFile item, int position){
-//        dataPass.onDataPass(item, position, musicNumber);
-//    }
+    private void seekBar(){
 
+        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
+        binding.seekBar.setMax(musicDuration);
+        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                if (fromUser){
+                    Intent intent = new Intent("MEDIA_PLAYER_SEEK");
+                    intent.putExtra("progress", progress);
+                    getActivity().sendBroadcast(intent);
 
-//    private void seekBar(){
-//
-//        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
-//        binding.seekBar.setMax(musicDuration);
-//        binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-//            @Override
-//            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-//                if (fromUser){
-//
-//                    musicService.mp.seekTo(progress);
-//                }
-//                int m= progress / 60000;
-//                int s= (progress % 60000) / 1000;
-//                String strTime = String.format("%02d:%02d", m, s);
-//                binding.playTime.setText(strTime);
-//            }
-//
-//            @Override
-//            public void onStartTrackingTouch(SeekBar seekBar) {
-//            }
-//
-//            @Override
-//            public void onStopTrackingTouch(SeekBar seekBar) {
-//            }
-//        });
-//    }
+                    musicService.mp.seekTo(progress);
+                }
+                int m= progress / 60000;
+                int s= (progress % 60000) / 1000;
+                String strTime = String.format("%01d:%02d", m, s);
+                binding.playTime.setText(strTime);
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+            }
+
+        });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+
+        if (serviceConnection != null) {
+            getActivity().unbindService(serviceConnection);
+        }
+    }
 
 }
