@@ -24,30 +24,52 @@ public class MyBroadcast extends BroadcastReceiver {
     public void onReceive(Context context, Intent intent) {
 
         Log.i("MyBroadcast","onReceive > "+ (TextUtils.isEmpty(intent.getAction())?"nonAction":intent.getAction()));
+        MainActivity mainActivity = (MainActivity) context; // MainActivity 인스턴스 가져오기
 
         if (intent.getAction()!= null){
             if (intent.getAction().equals("PLAY")){
 
-                Toast.makeText(context, "play", Toast.LENGTH_SHORT).show();
 
-                // MainActivity 인스턴스 가져오기
-                MainActivity mainActivity = (MainActivity) context;
                 // View 조작하기
                 mainActivity.findViewById(R.id.play).setVisibility(View.INVISIBLE);
                 mainActivity.findViewById(R.id.pause).setVisibility(View.VISIBLE);
 
-
             }else if (intent.getAction().equals("PAUSE")){
 
-                Toast.makeText(context, "pause", Toast.LENGTH_SHORT).show();
 
-                // MainActivity 인스턴스 가져오기
-                MainActivity mainActivity = (MainActivity) context;
                 // View 조작하기
                 mainActivity.findViewById(R.id.play).setVisibility(View.VISIBLE);
                 mainActivity.findViewById(R.id.pause).setVisibility(View.INVISIBLE);
+
+            }else if(intent.getAction().equals("PREVIOUS")){
+                mainActivity.playPreviousMusic();
+
+            }else if (intent.getAction().equals("NEXT")){
+                mainActivity.playNextMusic();
             }
         }
 
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

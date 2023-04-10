@@ -122,7 +122,12 @@ public class MusicListFragment extends Fragment {
                 String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                 String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
 
-                items.add(new MediaFile(data, artist, title, duration));
+                int getDuration= Integer.parseInt(duration);
+                int m= getDuration / 60000;
+                int s= (getDuration % 60000) / 1000;
+                String strTime = String.format("%01d:%02d", m, s);
+
+                items.add(new MediaFile(data, artist, title, strTime));
                 Log.d("DATAURI", data +", " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
             }
             cursor.close();
@@ -149,7 +154,7 @@ public class MusicListFragment extends Fragment {
 
     // 액티비티로 데이터 넘겨주는 메소드
     public void passData(MediaFile item, int position){
-        dataPass.onDataPass(item, position);
+        dataPass.onDataPass(item, position, items.size());
     }
 }
 

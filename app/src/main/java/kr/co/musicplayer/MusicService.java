@@ -20,6 +20,7 @@ import java.util.ArrayList;
 
 import kr.co.musicplayer.activities.MainActivity;
 import kr.co.musicplayer.fragments.MusicInfoFragment;
+import kr.co.musicplayer.fragments.MusicListFragment;
 import kr.co.musicplayer.model.MediaFile;
 
 public class MusicService extends Service implements MediaPlayer.OnPreparedListener, MediaPlayer.OnCompletionListener{
@@ -74,13 +75,15 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
             if (intent.getAction().equals(NotificationMediaStyle.ACTION_PLAY)) musicStart();
             else if (intent.getAction().equals(NotificationMediaStyle.ACTION_PAUSE)) musicPause();
+            else if (intent.getAction().equals(NotificationMediaStyle.ACTION_PREVIOUS)) sendBroadcast(new Intent("PREVIOUS"));
+            else if (intent.getAction().equals(NotificationMediaStyle.ACTION_NEXT)) sendBroadcast(new Intent("NEXT"));
 
         }else{
             try {
                 mp.reset();
                 mp.setDataSource(processCommand(intent).getData());
                 mp.prepare();
-                musicStart();
+                mp.start();
 
                 notificationMediaStyle.craeteNotification(this, processCommand(intent).getArtist(), processCommand(intent).getTitle(), 0);
 
@@ -91,6 +94,19 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             } catch (IOException e) {
                 Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
+
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    while (mp.isPlaying()){
+                        try {
+                            Thread.sleep(1000);
+                        } catch (InterruptedException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+            }).start();
         }
 
         //서비스가 실행될 때 실행

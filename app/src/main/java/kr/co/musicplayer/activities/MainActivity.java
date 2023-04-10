@@ -4,12 +4,15 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
+import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -64,9 +67,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     MusicService musicService;
     Intent intent;
     int position;
+    int musicNumber;
 
     private MyBroadcast myBroadcast;
-    public static final String CUSTOM_ACTION = "CUSTOM_ACTION";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -116,7 +119,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     // Fragment에서 넘긴 데이터 받아오는 메소드
     @Override
-    public void onDataPass(MediaFile item, int position) {
+    public void onDataPass(MediaFile item, int position, int itemsNumber) {
 
         mMediaFile = item;
 
@@ -130,6 +133,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.musicArtist.setText(item.getArtist());
         binding.musicTitle.setText(item.getTitle());
 
+        musicNumber= itemsNumber;
     }
 
     // Service에 데이터 보내기
@@ -196,6 +200,8 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         IntentFilter filter = new IntentFilter();
         filter.addAction("PLAY");
         filter.addAction("PAUSE");
+        filter.addAction("PREVIOUS");
+        filter.addAction("NEXT");
         registerReceiver(myBroadcast, filter);
     }
 
@@ -448,14 +454,19 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
 
     // 플레이중인 음악의 이전 음악 플레이하기
-    private void playPreviousMusic(){
-        Log.i("MainActivity", "playPreviousMusic() : " +position);
+    public void playPreviousMusic(){
+        Log.i("MainActivity", "playPreviousMusic() : " +position + ", " + musicNumber);
 
         MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
         if (musicListFragment!=null){
 
             if (musicService!=null){
-                musicListFragment.clickedPreviousOrNext(position-1);
+                if (0 == position){
+                    musicListFragment.clickedPreviousOrNext(musicNumber-1);
+                }else{
+                    musicListFragment.clickedPreviousOrNext(position-1);
+                }
+
             }else{
                 Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
             }
@@ -465,8 +476,10 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     }
 
-    private void playNextMusic(){
+    public void playNextMusic(){
         MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+        Log.i("positions", position+"");
         if (musicListFragment!=null){
 
             if (musicService!=null){

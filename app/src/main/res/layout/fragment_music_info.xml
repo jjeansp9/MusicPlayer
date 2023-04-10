@@ -58,7 +58,7 @@
         android:layout_height="wrap_content"
         android:layout_below="@id/seek_bar"
         android:layout_marginLeft="10dp"
-        android:text="00:00"/>
+        android:text="0:00"/>
 
     <TextView
         android:id="@+id/play_time_max"

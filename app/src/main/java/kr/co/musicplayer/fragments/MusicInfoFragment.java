@@ -80,7 +80,12 @@ public class MusicInfoFragment extends Fragment {
         Log.i("MusicInfoFragment onViewCreated", "MusicInfoFragment onViewCreated : " + mParam1+", "+mParam2);
         binding.musicComposer.setText(mParam2);
         binding.musicTitle.setText(mParam3);
-        binding.playTimeMax.setText(musicDuration+"");
+
+        int m= musicDuration / 60000;
+        int s= (musicDuration % 60000) / 1000;
+        String strTime = String.format("%01d:%02d", m, s);
+
+        binding.playTimeMax.setText(strTime);
 
 
 
