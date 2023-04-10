@@ -483,7 +483,12 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         if (musicListFragment!=null){
 
             if (musicService!=null){
-                musicListFragment.clickedPreviousOrNext(position+1);
+                if (position+1 ==  musicNumber){
+                    musicListFragment.clickedPreviousOrNext(0);
+                }else{
+                    musicListFragment.clickedPreviousOrNext(position+1);
+                }
+
             }else{
                 Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
             }

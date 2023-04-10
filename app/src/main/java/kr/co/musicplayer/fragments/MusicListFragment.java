@@ -116,7 +116,6 @@ public class MusicListFragment extends Fragment {
 
         if (cursor != null){
             while (cursor.moveToNext()) {
-
                 String artist = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ARTIST));
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
@@ -128,7 +127,6 @@ public class MusicListFragment extends Fragment {
                 String strTime = String.format("%01d:%02d", m, s);
 
                 items.add(new MediaFile(data, artist, title, strTime));
-                Log.d("DATAURI", data +", " + cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID)));
             }
             cursor.close();
         }
