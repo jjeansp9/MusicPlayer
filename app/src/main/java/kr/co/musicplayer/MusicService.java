@@ -80,7 +80,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 mp.reset();
                 mp.setDataSource(processCommand(intent).getData());
                 mp.prepare();
-                mp.start();
+                musicStart();
 
                 notificationMediaStyle.craeteNotification(this, processCommand(intent).getArtist(), processCommand(intent).getTitle(), 0);
 
@@ -91,19 +91,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             } catch (IOException e) {
                 Toast.makeText(this, "Error : " + e.getMessage(), Toast.LENGTH_SHORT).show();
             }
-
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    while (mp.isPlaying()){
-                        try {
-                            Thread.sleep(1000);
-                        } catch (InterruptedException e) {
-                            e.printStackTrace();
-                        }
-                    }
-                }
-            }).start();
         }
 
         //서비스가 실행될 때 실행

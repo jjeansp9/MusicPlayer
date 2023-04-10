@@ -142,6 +142,11 @@ public class MusicListFragment extends Fragment {
         });
     }
 
+    public void clickedPreviousOrNext(int position){
+        Log.i("MusicListFragment", "clickedPrevious() : " +position);
+        passData(items.get(position), position);
+    }
+
     // 액티비티로 데이터 넘겨주는 메소드
     public void passData(MediaFile item, int position){
         dataPass.onDataPass(item, position);

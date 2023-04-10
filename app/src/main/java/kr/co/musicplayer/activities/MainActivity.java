@@ -100,7 +100,8 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.list.setOnClickListener(v-> showFragment(MusicListFragment.newInstance("position", 20), 0));
 
         // 플레이중인 음악 정보를 보는 화면으로 이동
-        binding.info.setOnClickListener(v-> showFragment(MusicInfoFragment.newInstance("position", "", ""), 1));
+        binding.info.setOnClickListener(v-> showFragment(MusicInfoFragment.newInstance(
+                "position", mMediaFile.getArtist(), mMediaFile.getTitle(), musicService.mp.getDuration(), musicService.mp.getCurrentPosition()), 1));
 
         //seekBar();
 
@@ -121,6 +122,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         putDataToService(item);
         this.position = position;
+        Log.i("MainActivity", "onDataPass() : " +position);
 
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
@@ -129,6 +131,43 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.musicTitle.setText(item.getTitle());
 
     }
+
+    // Service에 데이터 보내기
+    private void putDataToService(MediaFile item){
+
+        if(musicService==null){
+            // MyService를 시작하기
+            intent.putExtra("data", item.getData());
+            intent.putExtra("title", item.getTitle());
+            intent.putExtra("artist", item.getArtist());
+            startService(intent);
+
+            // MyService와 연결(Bind)
+            bindService(intent, connection, 0); // 해당코드 입력시 MyService.java에 onBind() 실행
+        }else{
+            intent.putExtra("data", item.getData());
+            intent.putExtra("title", item.getTitle());
+            intent.putExtra("artist", item.getArtist());
+            startService(intent);
+
+        }
+    }
+
+    // MusicService와 연결
+    ServiceConnection connection= new ServiceConnection() {
+        @Override
+        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
+            MusicService.MyBinder binder= (MusicService.MyBinder) iBinder;
+            musicService= binder.getMyServiceAddress();
+
+            Log.i("onServiceConnected", "onServiceConnected");
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName componentName) {
+
+        }
+    };
 
     // 클릭한 버튼마다 각각의 프래그먼트 보여주기
     private void showFragment(Fragment fragment, int num){
@@ -141,8 +180,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             // 프래그먼트에서 전달받은 데이터를 가져옴
             Bundle bundle = getIntent().getExtras();
             if (bundle != null) mMediaFile = bundle.getParcelable("mediaFile");
-
-            fragment= MusicInfoFragment.newInstance("position", mMediaFile.getArtist(), mMediaFile.getTitle());
 
             binding.list.setVisibility(View.VISIBLE);
             binding.musicImage.setVisibility(View.INVISIBLE);
@@ -173,44 +210,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     }
 
 
-    // MusicService와 연결
-    ServiceConnection connection= new ServiceConnection() {
-        @Override
-        public void onServiceConnected(ComponentName componentName, IBinder iBinder) {
-            MusicService.MyBinder binder= (MusicService.MyBinder) iBinder;
-            musicService= binder.getMyServiceAddress();
-
-            Log.i("onServiceConnected", "onServiceConnected");
-        }
-
-        @Override
-        public void onServiceDisconnected(ComponentName componentName) {
-
-        }
-    };
-
-
-    // Service에 데이터 보내기
-    private void putDataToService(MediaFile item){
-
-        if(musicService==null){
-            // MyService를 시작하기
-            intent.putExtra("data", item.getData());
-            intent.putExtra("title", item.getTitle());
-            intent.putExtra("artist", item.getArtist());
-            startService(intent);
-
-            // MyService와 연결(Bind)
-            bindService(intent, connection, 0); // 해당코드 입력시 MyService.java에 onBind() 실행
-        }else{
-            intent.putExtra("data", item.getData());
-            intent.putExtra("title", item.getTitle());
-            intent.putExtra("artist", item.getArtist());
-            startService(intent);
-
-        }
-    }
-
     @Override
     protected void onNewIntent(Intent intent) {
 
@@ -219,10 +218,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         super.onNewIntent(intent);
     }
 
-    // 플레이중인 음악의 다음 음악 플레이하기
-    private void playNextMusic(){
-
-    }
 
     // 음악 재생
     private void musicPlay(){
@@ -454,12 +449,32 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     // 플레이중인 음악의 이전 음악 플레이하기
     private void playPreviousMusic(){
+        Log.i("MainActivity", "playPreviousMusic() : " +position);
 
-        // 프래그먼트로 데이터 전달
-        getSupportFragmentManager()
-                .beginTransaction()
-                .replace(R.id.fragment_container, MusicListFragment.newInstance("position", position), "position")
-                .commit();
+        MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (musicListFragment!=null){
+
+            if (musicService!=null){
+                musicListFragment.clickedPreviousOrNext(position-1);
+            }else{
+                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+            }
+        }
+
+
+
+    }
+
+    private void playNextMusic(){
+        MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+        if (musicListFragment!=null){
+
+            if (musicService!=null){
+                musicListFragment.clickedPreviousOrNext(position+1);
+            }else{
+                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 
 }
