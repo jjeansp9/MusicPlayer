@@ -69,6 +69,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     Intent intent;
     int position;
     int musicNumber;
+    int getFragmentNum=0;
 
     private MyBroadcast myBroadcast;
 
@@ -181,10 +182,12 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         if (num==0) {
             binding.list.setVisibility(View.INVISIBLE);
             binding.musicImage.setVisibility(View.VISIBLE);
+            getFragmentNum=0;
 
         }else{
             binding.list.setVisibility(View.VISIBLE);
             binding.musicImage.setVisibility(View.INVISIBLE);
+            getFragmentNum=1;
         }
 
         getSupportFragmentManager()
@@ -455,54 +458,82 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     public void playPreviousMusic(){
         Log.i("MainActivity", "playPreviousMusic() : " +position + ", " + musicNumber);
 
-        MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        if (musicListFragment!=null){
+        if (getFragmentNum==0){
+            MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (musicListFragment!=null){
 
-            if (musicService!=null){
-                if (0 == position){
-                    musicListFragment.clickedPreviousOrNext(musicNumber-1);
+                if (musicService!=null){
+                    if (0 == position){
+                        musicListFragment.clickedPreviousOrNext(musicNumber-1);
+                    }else{
+                        musicListFragment.clickedPreviousOrNext(position-1);
+                    }
+
                 }else{
-                    musicListFragment.clickedPreviousOrNext(position-1);
+                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
                 }
+            }
+        }else if (getFragmentNum==1){
+            MusicInfoFragment musicInfoFragment= (MusicInfoFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+            if (musicInfoFragment!=null){
 
-            }else{
-                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+                if (musicService!=null){
+                    if (0 == position){
+                        musicInfoFragment.clickedPreviousOrNext(musicNumber-1);
+                    }else{
+                        musicInfoFragment.clickedPreviousOrNext(position-1);
+                    }
+
+                }else{
+                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+                }
             }
         }
+
+
     }
 
     public void playNextMusic(){
-        //MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
-        MusicInfoFragment musicInfoFragment= (MusicInfoFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-        Log.i("positions", position+"");
-//        if (musicListFragment!=null){
-//
-//            if (musicService!=null){
-//                if (position+1 ==  musicNumber){
-//                    musicListFragment.clickedPreviousOrNext(0);
-//                }else{
-//                    musicListFragment.clickedPreviousOrNext(position+1);
-//                }
-//
-//            }else{
-//                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
-//            }
-//        }
 
-        if (musicInfoFragment!=null){
 
-            if (musicService!=null){
-                if (position+1 ==  musicNumber){
-                    musicInfoFragment.clickedPreviousOrNext(0);
+        if (getFragmentNum==0){
+            MusicListFragment musicListFragment= (MusicListFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
+
+            if (musicListFragment!=null){
+
+                if (musicService!=null){
+                    if (position+1 ==  musicNumber){
+                        musicListFragment.clickedPreviousOrNext(0);
+                    }else{
+                        musicListFragment.clickedPreviousOrNext(position+1);
+                    }
+
                 }else{
-                    musicInfoFragment.clickedPreviousOrNext(position+1);
+                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
                 }
+            }
+        }else if (getFragmentNum==1){
+            MusicInfoFragment musicInfoFragment= (MusicInfoFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_container);
 
-            }else{
-                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+            if (musicInfoFragment!=null){
+
+                if (musicService!=null){
+                    if (position+1 ==  musicNumber){
+                        musicInfoFragment.clickedPreviousOrNext(0);
+                    }else{
+                        musicInfoFragment.clickedPreviousOrNext(position+1);
+                    }
+
+                }else{
+                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+                }
             }
         }
+
+
+
+
     }
 
 }

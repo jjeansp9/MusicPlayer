@@ -113,6 +113,11 @@ public class MusicInfoFragment extends Fragment {
     public void clickedPreviousOrNext(int position){
         Log.i("MusicListFragment", "clickedPrevious() : " +position);
         passData(items.get(position), position);
+
+        binding.musicComposer.setText(items.get(position).getArtist());
+        binding.musicTitle.setText(items.get(position).getTitle());
+
+        binding.playTimeMax.setText(items.get(position).getDuration());
     }
 
     // 액티비티로 데이터 넘겨주는 메소드
