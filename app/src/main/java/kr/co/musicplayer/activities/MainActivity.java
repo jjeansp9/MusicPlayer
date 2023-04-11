@@ -108,11 +108,23 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         // 음악리스트 화면으로 이동
         binding.list.setOnClickListener(v-> showFragment(MusicListFragment.newInstance("position", 20), 0, position));
 
-        // 플레이중인 음악 정보를 보는 화면으로 이동
-        binding.info.setOnClickListener(v-> showFragment(MusicInfoFragment.newInstance(
-                "position", mMediaFile.getArtist(), mMediaFile.getTitle(), musicService.mp.getDuration(), musicService.mp.getCurrentPosition(), musicNumber, items, position), 1, position));
 
-        //seekBar();
+
+        // 플레이중인 음악 정보를 보는 화면으로 이동
+        binding.musicImage.setOnClickListener(v-> {
+            if (musicService!= null){
+                showFragment(MusicInfoFragment.newInstance(
+                        "position", mMediaFile.getArtist(),
+                        mMediaFile.getTitle(),
+                        musicService.mp.getDuration(),
+                        musicService.mp.getCurrentPosition(),
+                        musicNumber, items, position), 1, position);
+
+            }else {
+                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
+            }});
+
+
 
         binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
@@ -134,6 +146,21 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         putDataToService(item);
         Log.i("MainActivity", "onDataPass() : " +position + ", items : " + items.size());
 
+        if (items.size() != 0){
+            Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
+            Bitmap albumArt = null;
+
+            try {
+                albumArt = MediaStore.Images.Media.getBitmap(getContentResolver(), albumArtUri);
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            binding.musicImage.setImageBitmap(albumArt);
+        }
+
         binding.play.setVisibility(View.INVISIBLE);
         binding.pause.setVisibility(View.VISIBLE);
 
@@ -152,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             intent.putExtra("data", item.getData());
             intent.putExtra("title", item.getTitle());
             intent.putExtra("artist", item.getArtist());
+            intent.putExtra("uri", item.getUri());
             startService(intent);
 
             // MyService와 연결(Bind)
@@ -160,6 +188,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             intent.putExtra("data", item.getData());
             intent.putExtra("title", item.getTitle());
             intent.putExtra("artist", item.getArtist());
+            intent.putExtra("uri", item.getUri());
             startService(intent);
 
         }
@@ -197,8 +226,9 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
-
                 binding.musicImage.setImageBitmap(albumArt);
+            }else{
+                binding.musicImage.setImageResource(R.drawable.ic_baseline_image_24);
             }
 
             binding.list.setVisibility(View.INVISIBLE);
@@ -206,15 +236,36 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             getFragmentNum=0;
 
         }else{
+            if (items.size() != 0){
+                Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
+                Bitmap albumArt = null;
+
+                try {
+                    albumArt = MediaStore.Images.Media.getBitmap(getContentResolver(), albumArtUri);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                binding.musicImage.setImageBitmap(albumArt);
+            }else{
+                binding.musicImage.setImageResource(R.drawable.ic_baseline_image_24);
+            }
+
             binding.list.setVisibility(View.VISIBLE);
             binding.musicImage.setVisibility(View.INVISIBLE);
             getFragmentNum=1;
+
         }
 
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment, "position")
                 .commit();
+
+
+
     }
 
     private void registerBroadcast() {

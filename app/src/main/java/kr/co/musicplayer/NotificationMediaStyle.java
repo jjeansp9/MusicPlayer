@@ -8,15 +8,21 @@ import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.util.Log;
 import android.view.View;
 import android.widget.RemoteViews;
 
 import androidx.core.app.NotificationCompat;
+
+import java.io.FileNotFoundException;
+import java.io.IOException;
 
 import kr.co.musicplayer.activities.MainActivity;
 import kr.co.musicplayer.model.MediaFile;
@@ -32,7 +38,7 @@ public class NotificationMediaStyle {
     public static String ACTION_PREVIOUS="PREVIOUS";
     public static String ACTION_NEXT="NEXT";
 
-    protected void craeteNotification(Context context, String artist, String title, int num){
+    protected void craeteNotification(Context context, String artist, String title, long uri, int num){
 
         // 운영체제로부터 알림(Notification)을 관리하는 관리자 객체 소환
         notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -84,7 +90,19 @@ public class NotificationMediaStyle {
 
         //Bitmap bm= BitmapFactory.decodeResource(getResources(), R.drawable.newyork);
 
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + uri);
+        Bitmap albumArt = null;
+
+        try {
+            albumArt = MediaStore.Images.Media.getBitmap(context.getContentResolver(), albumArtUri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
         builder.setSmallIcon(R.drawable.ic_baseline_music_note_24)
+                .setLargeIcon(albumArt)
                 .setContentTitle(title)
                 .setContentText(artist)
                 .addAction(R.drawable.ic_baseline_fast_rewind_24, "", prevPendingIntent) // #0

@@ -48,7 +48,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             Intent intent = new Intent("MEDIA_PLAYER_PROGRESS");
             intent.putExtra("progress", currentPosition);
             sendBroadcast(intent);
-            mHandler.postDelayed(mUpdateTimeTask, 1000);
+            mHandler.postDelayed(mUpdateTimeTask, 100);
         }
     }
 
@@ -59,7 +59,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 int currentPosition = mp.getCurrentPosition();
                 seekBar.setProgress(currentPosition);
             }
-            mHandler.postDelayed(this, 1000);
+            mHandler.postDelayed(this, 100);
         }
     };
 
@@ -103,6 +103,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             String data = intent.getStringExtra("data");
             String title = intent.getStringExtra("title");
             String artist = intent.getStringExtra("artist");
+            long uri = intent.getLongExtra("uri", 0);
 
             if (intent.getAction()!=null && intent.getAction().equals(NotificationMediaStyle.ACTION_PLAY)) musicStart();
             else if (intent.getAction()!=null && intent.getAction().equals(NotificationMediaStyle.ACTION_PAUSE)) musicPause();
@@ -119,9 +120,9 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
                     if (notificationMediaStyle==null){
                         notificationMediaStyle = new NotificationMediaStyle();
-                        notificationMediaStyle.craeteNotification(this, artist, title, 0);
+                        notificationMediaStyle.craeteNotification(this, artist, title, uri,0);
                     }else{
-                        notificationMediaStyle.craeteNotification(this, artist, title, 0);
+                        notificationMediaStyle.craeteNotification(this, artist, title, uri, 0);
                     }
 
                     mediaFile.setArtist(artist);
@@ -139,7 +140,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 public void run() {
                     while (mp.isPlaying()){
                         try {
-                            Thread.sleep(1);
+                            Thread.sleep(100);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -234,7 +235,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             public void run() {
                 while (mp.isPlaying()){
                     try {
-                        Thread.sleep(1);
+                        Thread.sleep(100);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -244,7 +245,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }).start();
 
         sendBroadcast(new Intent("PLAY"));
-        notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 0);
+        notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), mediaFile.getUri(), 0);
         return "Start";
     }
 
@@ -252,7 +253,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         mp.pause();
 
         sendBroadcast(new Intent("PAUSE"));
-        notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), 1);
+        notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), mediaFile.getUri(), 1);
 
         return "Pause";
     }

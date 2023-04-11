@@ -199,6 +199,7 @@ public class MusicInfoFragment extends Fragment {
             e.printStackTrace();
         }
 
+
         binding.musicImage.setImageBitmap(albumArt);
 
         binding.musicComposer.setText(items.get(position).getArtist());
