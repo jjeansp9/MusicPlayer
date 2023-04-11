@@ -78,10 +78,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public int onStartCommand(Intent intent, int flags, int startId) {
 
         if (intent == null){
-            if (notificationMediaStyle!=null){
-                notificationMediaStyle.finishNotification(getApplication());
-                notificationMediaStyle=null;
-            }
+            MusicStop();
             return START_NOT_STICKY;
         }else{
             String data = intent.getStringExtra("data");
@@ -155,10 +152,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         super.onDestroy();
         //서비스가 종료될 때 실행
         mp.stop(); //음악 종료
-        if (notificationMediaStyle!=null){
-            notificationMediaStyle.finishNotification(getApplication());
-            notificationMediaStyle=null;
-        }
 
         // 강제종료시 다시 서비스 시작
         Intent intent = new Intent(getApplicationContext(), MusicService.class);
@@ -169,28 +162,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         Log.d("Service onDestroy", "onDestroy");
 
     }
-
-//    private MediaFile processCommand(Intent intent) {
-//
-//        String data = intent.getStringExtra("data");
-//        String title = intent.getStringExtra("title");
-//        String artist = intent.getStringExtra("artist");
-//
-//        if (items.size()==0) items.add(new MediaFile(data, artist, title, ""));
-//        else items.set(0, new MediaFile(data, artist, title, ""));
-//
-//
-//        Intent showIntent = new Intent(getApplicationContext(), MainActivity.class);
-//
-//        showIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-//                Intent.FLAG_ACTIVITY_SINGLE_TOP |
-//                Intent.FLAG_ACTIVITY_CLEAR_TOP);
-//
-//        //showIntent.putExtra("data", command);
-//        startActivity(showIntent); // Service에서 Activity로 데이터를 전달
-//
-//        return items.get(0);
-//    }
 
     // bindService()를 실행할 때 자동 발동하는 메소드
     @Nullable
@@ -251,6 +222,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), mediaFile.getUri(), 1);
 
         return "Pause";
+    }
+
+    public void MusicStop(){
+        mp.stop();
+        if (notificationMediaStyle!=null){
+            notificationMediaStyle.finishNotification(getApplication());
+            notificationMediaStyle=null;
+        }
     }
 
 }

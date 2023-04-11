@@ -469,6 +469,14 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             users.setImage("");
         }
 
+        if (musicService!=null){
+            musicService.MusicStop();
+            musicService= null;
+            if (connection != null){
+                unbindService(connection);
+                connection = null;
+            }
+        }
         Toast.makeText(MainActivity.this, "회원탈퇴 성공", Toast.LENGTH_SHORT).show();
     }
 
@@ -551,9 +559,15 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     public void onDestroy() {
         super.onDestroy();
 
-        if (connection != null) {
-            unbindService(connection);
-        }
+//        if (musicService!=null){
+//            if (connection != null) {
+//                unbindService(connection);
+//                connection = null;
+//            }else{
+//                Log.d("MainActivity onDestroy" , "ServiceConnection is not registered");
+//            }
+//        }
+
     }
 
 }
