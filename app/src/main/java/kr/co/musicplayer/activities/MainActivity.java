@@ -10,8 +10,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.IBinder;
+import android.provider.MediaStore;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
@@ -32,6 +35,8 @@ import com.navercorp.nid.oauth.OAuthLoginCallback;
 import com.navercorp.nid.profile.NidProfileCallback;
 import com.navercorp.nid.profile.data.NidProfileResponse;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import kotlin.Unit;
@@ -55,7 +60,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private ImageView userImage;
     private TextView userEmail;
 
-    private MediaFile mMediaFile= new MediaFile("","","","");
+    private MediaFile mMediaFile= new MediaFile("","","","", R.drawable.ic_baseline_image_24);
     private ArrayList<MediaFile> items= new ArrayList<>();
 
     //    private DrawerLayout drawerLayout;
@@ -67,7 +72,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     MusicService musicService;
     Intent intent;
-    int position;
+    int position= 0;
     int musicNumber;
     int getFragmentNum=0;
 
@@ -95,17 +100,17 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
             }
         });
 
-        showFragment(MusicListFragment.newInstance("position", 20), 0);
+        showFragment(MusicListFragment.newInstance("position", 20), 0, position);
 
         findViewById(R.id.un_link).setOnClickListener(v -> unLinkUser(loadUserInfo)); // 회원탈퇴 버튼
 
 
         // 음악리스트 화면으로 이동
-        binding.list.setOnClickListener(v-> showFragment(MusicListFragment.newInstance("position", 20), 0));
+        binding.list.setOnClickListener(v-> showFragment(MusicListFragment.newInstance("position", 20), 0, position));
 
         // 플레이중인 음악 정보를 보는 화면으로 이동
         binding.info.setOnClickListener(v-> showFragment(MusicInfoFragment.newInstance(
-                "position", mMediaFile.getArtist(), mMediaFile.getTitle(), musicService.mp.getDuration(), musicService.mp.getCurrentPosition(), musicNumber, items), 1));
+                "position", mMediaFile.getArtist(), mMediaFile.getTitle(), musicService.mp.getDuration(), musicService.mp.getCurrentPosition(), musicNumber, items, position), 1, position));
 
         //seekBar();
 
@@ -177,9 +182,25 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     };
 
     // 클릭한 버튼마다 각각의 프래그먼트 보여주기
-    private void showFragment(Fragment fragment, int num){
+    private void showFragment(Fragment fragment, int num, int position){
 
         if (num==0) {
+
+            if (items.size() != 0){
+                Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
+                Bitmap albumArt = null;
+
+                try {
+                    albumArt = MediaStore.Images.Media.getBitmap(getContentResolver(), albumArtUri);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                binding.musicImage.setImageBitmap(albumArt);
+            }
+
             binding.list.setVisibility(View.INVISIBLE);
             binding.musicImage.setVisibility(View.VISIBLE);
             getFragmentNum=0;

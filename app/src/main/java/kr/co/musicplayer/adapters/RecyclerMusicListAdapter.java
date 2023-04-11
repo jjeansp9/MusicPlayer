@@ -1,6 +1,9 @@
 package kr.co.musicplayer.adapters;
 
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.net.Uri;
+import android.provider.MediaStore;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +11,8 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import kr.co.musicplayer.R;
@@ -49,6 +54,19 @@ public class RecyclerMusicListAdapter extends RecyclerView.Adapter<RecyclerMusic
         holder.binding.title.setText(item.getTitle());
         holder.binding.duration.setText(item.getDuration());
         holder.binding.data.setText(item.getData());
+
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + item.getUri());
+        Bitmap albumArt = null;
+
+        try {
+            albumArt = MediaStore.Images.Media.getBitmap(context.getContentResolver(), albumArtUri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        holder.binding.img.setImageBitmap(albumArt);
 
         holder.binding.getRoot().setOnClickListener( v -> itemClickListener.onClick(holder.binding.getRoot(), position));
     }

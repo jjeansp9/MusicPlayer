@@ -39,7 +39,8 @@
                     android:layout_height="50dp"
                     android:layout_centerVertical="true"
                     android:padding="4dp"
-                    android:src="@drawable/ic_baseline_image_24" />
+                    android:src="@drawable/ic_baseline_image_24"
+                    android:scaleType="centerCrop"/>
 
                 <RelativeLayout
                     android:layout_width="wrap_content"

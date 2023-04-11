@@ -123,13 +123,14 @@ public class MusicListFragment extends Fragment {
                 String title = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.TITLE));
                 String duration = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DURATION));
                 String data = cursor.getString(cursor.getColumnIndex(MediaStore.Audio.Media.DATA));
+                long albumId = cursor.getLong(cursor.getColumnIndex(MediaStore.Audio.Media.ALBUM_ID));
 
                 int getDuration= Integer.parseInt(duration);
                 int m= getDuration / 60000;
                 int s= (getDuration % 60000) / 1000;
                 String strTime = String.format("%01d:%02d", m, s);
 
-                items.add(new MediaFile(data, artist, title, strTime));
+                items.add(new MediaFile(data, artist, title, strTime, albumId));
             }
             cursor.close();
         }

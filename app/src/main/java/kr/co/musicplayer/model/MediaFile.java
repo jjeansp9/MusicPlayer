@@ -15,12 +15,22 @@ public class MediaFile implements Parcelable {
     String artist;
     String title;
     String duration;
+    long uri;
 
-    public MediaFile(String data, String artist, String title, String duration) {
+    public MediaFile(String data, String artist, String title, String duration, long uri) {
         this.data = data;
         this.artist = artist;
         this.title = title;
         this.duration = duration;
+        this.uri = uri;
+    }
+
+    public long getUri() {
+        return uri;
+    }
+
+    public void setUri(long uri) {
+        this.uri = uri;
     }
 
     public String getData() {

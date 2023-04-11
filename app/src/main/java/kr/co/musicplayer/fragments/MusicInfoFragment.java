@@ -8,10 +8,13 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
+import android.graphics.Bitmap;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +26,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 
 import kr.co.musicplayer.MusicService;
@@ -46,6 +51,7 @@ public class MusicInfoFragment extends Fragment {
     private static final String ARG_PARAM5 = "param5";
     private static final String ARG_PARAM6 = "param6";
     private static final String ARG_PARAM7 = "param7";
+    private static final String ARG_PARAM8 = "param8";
 
     private String mParam1;
     private String mParam2;
@@ -54,6 +60,7 @@ public class MusicInfoFragment extends Fragment {
     private int musicCurrentDuration;
     private int musicNumber;
     private ArrayList<MediaFile> items= new ArrayList<>();
+    private int position;
 
     private BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
         @Override
@@ -67,7 +74,7 @@ public class MusicInfoFragment extends Fragment {
 
 
 
-    public static MusicInfoFragment newInstance(String param1, String param2, String param3, int param4, int param5, int param6, ArrayList<MediaFile> items) {
+    public static MusicInfoFragment newInstance(String param1, String param2, String param3, int param4, int param5, int param6, ArrayList<MediaFile> items, int position) {
         MusicInfoFragment fragment = new MusicInfoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
@@ -77,6 +84,7 @@ public class MusicInfoFragment extends Fragment {
         args.putInt(ARG_PARAM5, param5);
         args.putInt(ARG_PARAM6, param6);
         args.putParcelableArrayList(ARG_PARAM7, items);
+        args.putInt(ARG_PARAM8, position);
         fragment.setArguments(args);
 
         return fragment;
@@ -93,6 +101,7 @@ public class MusicInfoFragment extends Fragment {
             musicCurrentDuration = getArguments().getInt(ARG_PARAM5);
             musicNumber = getArguments().getInt(ARG_PARAM6);
             items = getArguments().getParcelableArrayList(ARG_PARAM7);
+            position = getArguments().getInt(ARG_PARAM8);
         }
     }
 
@@ -109,6 +118,20 @@ public class MusicInfoFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
 
         Log.i("MusicInfoFragment onViewCreated", "MusicInfoFragment onViewCreated : " + mParam1+", "+mParam2 + ", " + items.size());
+
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
+        Bitmap albumArt = null;
+
+        try {
+            albumArt = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), albumArtUri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        binding.musicImage.setImageBitmap(albumArt);
+
         binding.musicComposer.setText(mParam2);
         binding.musicTitle.setText(mParam3);
 
@@ -164,6 +187,19 @@ public class MusicInfoFragment extends Fragment {
     public void clickedPreviousOrNext(int position){
         Log.i("MusicListFragment", "clickedPrevious() : " +position);
         passData(items.get(position), position);
+
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
+        Bitmap albumArt = null;
+
+        try {
+            albumArt = MediaStore.Images.Media.getBitmap(getActivity().getContentResolver(), albumArtUri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        binding.musicImage.setImageBitmap(albumArt);
 
         binding.musicComposer.setText(items.get(position).getArtist());
         binding.musicTitle.setText(items.get(position).getTitle());

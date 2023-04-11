@@ -1,23 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="100dp"
-    android:padding="16dp">
+    android:layout_height="70dp"
+    android:padding="12dp">
+
+    <ImageView
+        android:id="@+id/img"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_centerVertical="true"
+        android:layout_marginRight="16dp"
+        android:scaleType="centerCrop"
+        android:src="@drawable/ic_baseline_image_24" />
+
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@+id/img"
+        android:text="음악 제목"
+        android:textSize="14sp"
+        android:textColor="@color/black"/>
 
     <TextView
         android:id="@+id/composer"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="작곡가"
-        android:textSize="16sp"
-        android:layout_alignParentBottom="true"/>
+        android:layout_toRightOf="@+id/img"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/black"
+        android:textStyle="bold"/>
 
-    <TextView
-        android:id="@+id/title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="음악 제목"
-        android:textSize="20sp"/>
+
 
     <TextView
         android:id="@+id/duration"

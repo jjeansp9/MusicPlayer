@@ -32,7 +32,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private NotificationMediaStyle notificationMediaStyle;
 
     private ArrayList<MediaFile> items= new ArrayList<>();
-    private MediaFile mediaFile= new MediaFile("", "", "", "");
+    private MediaFile mediaFile= new MediaFile("", "", "", "", R.drawable.ic_baseline_image_24);
 
     private boolean isPrepared = false;
     private Handler mHandler = new Handler();
