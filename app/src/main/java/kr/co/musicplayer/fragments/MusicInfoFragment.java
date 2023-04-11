@@ -216,11 +216,16 @@ public class MusicInfoFragment extends Fragment {
 
     private void seekBar(){
 
-        binding.seekBar.setVisibility(ProgressBar.VISIBLE);
         binding.seekBar.setMax(musicDuration);
         binding.seekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+
+                int m= progress / 60000;
+                int s= (progress % 60000) / 1000;
+                String strTime = String.format("%01d:%02d", m, s);
+                binding.playTime.setText(strTime);
+
                 if (fromUser){
                     Intent intent = new Intent("MEDIA_PLAYER_SEEK");
                     intent.putExtra("progress", progress);
@@ -228,10 +233,7 @@ public class MusicInfoFragment extends Fragment {
 
                     musicService.mp.seekTo(progress);
                 }
-                int m= progress / 60000;
-                int s= (progress % 60000) / 1000;
-                String strTime = String.format("%01d:%02d", m, s);
-                binding.playTime.setText(strTime);
+
             }
 
             @Override

@@ -77,22 +77,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-//        String action = intent.getAction();
-//        Log.i("Service onStartCommand", "Service onStartCommand : " + (action!=null?action:"none action"));
-
-//        if (intent == null){
-//            String data = intent.getStringExtra("data");
-//            String title = intent.getStringExtra("title");
-//            String artist = intent.getStringExtra("artist");
-//            intent.setAction("default_action");
-//            stopService(intent);
-//
-//            if (notificationMediaStyle!=null){
-//                notificationMediaStyle.finishNotification(getApplication());
-//                notificationMediaStyle=null;
-//            }
-//            return START_NOT_STICKY;
-//        }
         if (intent == null){
             if (notificationMediaStyle!=null){
                 notificationMediaStyle.finishNotification(getApplication());
@@ -148,6 +132,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     }
                 }
             }).start();
+
+            playingMusic();
         }
 
         Log.d("Service onStartCommand", "onStartCommand : ");
@@ -155,7 +141,14 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         return START_STICKY;
     }
 
-
+    private void playingMusic(){
+        mp.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+            @Override
+            public void onCompletion(MediaPlayer mediaPlayer) {
+                sendBroadcast(new Intent("NEXT"));
+            }
+        });
+    }
 
     @Override
     public void onDestroy() {
@@ -243,6 +236,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 }
             }
         }).start();
+
+        playingMusic();
 
         sendBroadcast(new Intent("PLAY"));
         notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), mediaFile.getUri(), 0);
