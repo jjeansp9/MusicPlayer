@@ -48,8 +48,6 @@ public class MusicInfoFragment extends Fragment {
     private static final String ARG_PARAM2 = "param2";
     private static final String ARG_PARAM3 = "param3";
     private static final String ARG_PARAM4 = "param4";
-    private static final String ARG_PARAM5 = "param5";
-    private static final String ARG_PARAM6 = "param6";
     private static final String ARG_PARAM7 = "param7";
     private static final String ARG_PARAM8 = "param8";
 
@@ -57,8 +55,6 @@ public class MusicInfoFragment extends Fragment {
     private String mParam2;
     private String mParam3;
     private int musicDuration;
-    private int musicCurrentDuration;
-    private int musicNumber;
     private ArrayList<MediaFile> items= new ArrayList<>();
     private int position;
 
@@ -74,15 +70,13 @@ public class MusicInfoFragment extends Fragment {
 
 
 
-    public static MusicInfoFragment newInstance(String param1, String param2, String param3, int param4, int param5, int param6, ArrayList<MediaFile> items, int position) {
+    public static MusicInfoFragment newInstance(String param1, String param2, String param3, int param4, ArrayList<MediaFile> items, int position) {
         MusicInfoFragment fragment = new MusicInfoFragment();
         Bundle args = new Bundle();
         args.putString(ARG_PARAM1, param1);
         args.putString(ARG_PARAM2, param2);
         args.putString(ARG_PARAM3, param3);
         args.putInt(ARG_PARAM4, param4);
-        args.putInt(ARG_PARAM5, param5);
-        args.putInt(ARG_PARAM6, param6);
         args.putParcelableArrayList(ARG_PARAM7, items);
         args.putInt(ARG_PARAM8, position);
         fragment.setArguments(args);
@@ -98,8 +92,6 @@ public class MusicInfoFragment extends Fragment {
             mParam2 = getArguments().getString(ARG_PARAM2);
             mParam3 = getArguments().getString(ARG_PARAM3);
             musicDuration = getArguments().getInt(ARG_PARAM4);
-            musicCurrentDuration = getArguments().getInt(ARG_PARAM5);
-            musicNumber = getArguments().getInt(ARG_PARAM6);
             items = getArguments().getParcelableArrayList(ARG_PARAM7);
             position = getArguments().getInt(ARG_PARAM8);
         }

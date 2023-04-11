@@ -116,9 +116,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                 showFragment(MusicInfoFragment.newInstance(
                         "position", mMediaFile.getArtist(),
                         mMediaFile.getTitle(),
-                        musicService.mp.getDuration(),
-                        musicService.mp.getCurrentPosition(),
-                        musicNumber, items, position), 1, position);
+                        musicService.mp.getDuration(), items, position), 1, position);
 
             }else {
                 Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
@@ -270,9 +268,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment, "position")
                 .commit();
-
-
-
     }
 
     private void registerBroadcast() {
