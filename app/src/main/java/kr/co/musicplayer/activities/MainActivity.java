@@ -2,6 +2,8 @@ package kr.co.musicplayer.activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.GravityCompat;
+import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 
 import android.content.BroadcastReceiver;
@@ -63,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private MediaFile mMediaFile= new MediaFile("","","","", R.drawable.ic_baseline_image_24);
     private ArrayList<MediaFile> items= new ArrayList<>();
 
-    //    private DrawerLayout drawerLayout;
+    private DrawerLayout drawerLayout;
 //    View navBar;
 
     private NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
@@ -108,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         // 음악리스트 화면으로 이동
         binding.list.setOnClickListener(v-> showFragment(MusicListFragment.newInstance("position", 20), 0, position));
 
-
-
         // 플레이중인 음악 정보를 보는 화면으로 이동
         binding.musicImage.setOnClickListener(v-> {
             if (musicService!= null){
@@ -124,7 +124,14 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                 Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
             }});
 
-
+        drawerLayout= findViewById(R.id.drawer_layout);
+        
+        // 사이드바가 열린 상태에서 바깥 영역 클릭시 사이드바 닫기
+        binding.mainRoot.setOnClickListener(v -> {
+            if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+                drawerLayout.closeDrawer(GravityCompat.START);
+            }
+        });
 
         binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
