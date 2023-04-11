@@ -77,28 +77,55 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
 
-        String action = intent.getAction();
-        Log.i("Service onStartCommand", "Service onStartCommand : " + (action!=null?action:"none action"));
-        if (action!=null){
+//        String action = intent.getAction();
+//        Log.i("Service onStartCommand", "Service onStartCommand : " + (action!=null?action:"none action"));
 
-        }
+//        if (intent == null){
+//            String data = intent.getStringExtra("data");
+//            String title = intent.getStringExtra("title");
+//            String artist = intent.getStringExtra("artist");
+//            intent.setAction("default_action");
+//            stopService(intent);
+//
+//            if (notificationMediaStyle!=null){
+//                notificationMediaStyle.finishNotification(getApplication());
+//                notificationMediaStyle=null;
+//            }
+//            return START_NOT_STICKY;
+//        }
+        if (intent == null){
+            if (notificationMediaStyle!=null){
+                notificationMediaStyle.finishNotification(getApplication());
+                notificationMediaStyle=null;
+            }
+            return START_NOT_STICKY;
+        }else{
+            String data = intent.getStringExtra("data");
+            String title = intent.getStringExtra("title");
+            String artist = intent.getStringExtra("artist");
 
-        if (intent.getAction()!= null && intent.getAction().equals(NotificationMediaStyle.ACTION_PLAY)) musicStart();
-        else if (intent.getAction()!= null && intent.getAction().equals(NotificationMediaStyle.ACTION_PAUSE)) musicPause();
-        else if (intent.getAction()!= null && intent.getAction().equals(NotificationMediaStyle.ACTION_PREVIOUS)) sendBroadcast(new Intent("PREVIOUS"));
-        else if (intent.getAction()!= null && intent.getAction().equals(NotificationMediaStyle.ACTION_NEXT)) sendBroadcast(new Intent("NEXT"));
-        else{
+            if (intent.getAction()!=null && intent.getAction().equals(NotificationMediaStyle.ACTION_PLAY)) musicStart();
+            else if (intent.getAction()!=null && intent.getAction().equals(NotificationMediaStyle.ACTION_PAUSE)) musicPause();
+            else if (intent.getAction()!=null && intent.getAction().equals(NotificationMediaStyle.ACTION_PREVIOUS)) sendBroadcast(new Intent("PREVIOUS"));
+            else if (intent.getAction()!=null && intent.getAction().equals(NotificationMediaStyle.ACTION_NEXT)) sendBroadcast(new Intent("NEXT"));
+
             try {
-                if (processCommand(intent).getData() != null){
+                if (data != null){
+
                     mp.reset();
-                    mp.setDataSource(processCommand(intent).getData());
+                    mp.setDataSource(data);
                     mp.prepare();
                     mp.start();
 
-                    notificationMediaStyle.craeteNotification(this, processCommand(intent).getArtist(), processCommand(intent).getTitle(), 0);
+                    if (notificationMediaStyle==null){
+                        notificationMediaStyle = new NotificationMediaStyle();
+                        notificationMediaStyle.craeteNotification(this, artist, title, 0);
+                    }else{
+                        notificationMediaStyle.craeteNotification(this, artist, title, 0);
+                    }
 
-                    mediaFile.setArtist(processCommand(intent).getArtist());
-                    mediaFile.setTitle(processCommand(intent).getTitle());
+                    mediaFile.setArtist(artist);
+                    mediaFile.setTitle(title);
 
                     sendBroadcast(new Intent("PLAY"));
                 }
@@ -112,7 +139,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                 public void run() {
                     while (mp.isPlaying()){
                         try {
-                            Thread.sleep(1000);
+                            Thread.sleep(1);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -122,10 +149,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             }).start();
         }
 
-        Log.d("Service onStartCommand", "onStartCommand, " + processCommand(intent));
+        Log.d("Service onStartCommand", "onStartCommand : ");
 
         return START_STICKY;
     }
+
+
 
     @Override
     public void onDestroy() {
@@ -143,32 +172,31 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pendingIntent);
 
-
         Log.d("Service onDestroy", "onDestroy");
 
     }
 
-    private MediaFile processCommand(Intent intent) {
-
-        String data = intent.getStringExtra("data");
-        String title = intent.getStringExtra("title");
-        String artist = intent.getStringExtra("artist");
-
-        if (items.size()==0) items.add(new MediaFile(data, artist, title, ""));
-        else items.set(0, new MediaFile(data, artist, title, ""));
-
-
-        Intent showIntent = new Intent(getApplicationContext(), MainActivity.class);
-
-        showIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                Intent.FLAG_ACTIVITY_SINGLE_TOP |
-                Intent.FLAG_ACTIVITY_CLEAR_TOP);
-
-        //showIntent.putExtra("data", command);
-        startActivity(showIntent); // Service에서 Activity로 데이터를 전달
-
-        return items.get(0);
-    }
+//    private MediaFile processCommand(Intent intent) {
+//
+//        String data = intent.getStringExtra("data");
+//        String title = intent.getStringExtra("title");
+//        String artist = intent.getStringExtra("artist");
+//
+//        if (items.size()==0) items.add(new MediaFile(data, artist, title, ""));
+//        else items.set(0, new MediaFile(data, artist, title, ""));
+//
+//
+//        Intent showIntent = new Intent(getApplicationContext(), MainActivity.class);
+//
+//        showIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
+//                Intent.FLAG_ACTIVITY_SINGLE_TOP |
+//                Intent.FLAG_ACTIVITY_CLEAR_TOP);
+//
+//        //showIntent.putExtra("data", command);
+//        startActivity(showIntent); // Service에서 Activity로 데이터를 전달
+//
+//        return items.get(0);
+//    }
 
     // bindService()를 실행할 때 자동 발동하는 메소드
     @Nullable
@@ -201,13 +229,12 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     public String musicStart(){
         mp.start();
 
-
         new Thread(new Runnable() {
             @Override
             public void run() {
                 while (mp.isPlaying()){
                     try {
-                        Thread.sleep(1000);
+                        Thread.sleep(1);
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }

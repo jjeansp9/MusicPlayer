@@ -82,7 +82,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding= ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        intent = new Intent(getApplicationContext(), MusicService.class);
 
         getUserData(loadUserInfo);
 
@@ -143,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private void putDataToService(MediaFile item){
 
         if(musicService==null){
+            intent = new Intent(getApplicationContext(), MusicService.class);
             // MyService를 시작하기
             intent.putExtra("data", item.getData());
             intent.putExtra("title", item.getTitle());

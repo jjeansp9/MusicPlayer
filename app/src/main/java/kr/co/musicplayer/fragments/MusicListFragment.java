@@ -105,7 +105,7 @@ public class MusicListFragment extends Fragment {
                 MediaStore.Audio.Media.DATA,
                 MediaStore.Audio.Media.ARTIST,
                 MediaStore.Audio.Media.DURATION,
-                MediaStore.Audio.Media.ALBUM_ID,
+                MediaStore.Audio.Media.ALBUM_ID
         };
 
         Log.d("ContentUri", MediaStore.Audio.Media.EXTERNAL_CONTENT_URI+"");
