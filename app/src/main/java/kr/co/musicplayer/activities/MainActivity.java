@@ -66,10 +66,8 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private ArrayList<MediaFile> items= new ArrayList<>();
 
     private DrawerLayout drawerLayout;
-//    View navBar;
 
     private NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
-
     private User users= new User();
 
     MusicService musicService;
@@ -119,7 +117,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                         musicService.mp.getDuration(), items, position), 1, position);
 
             }else {
-                Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
             }});
 
         drawerLayout= findViewById(R.id.drawer_layout);
@@ -219,59 +216,44 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     private void showFragment(Fragment fragment, int num, int position){
 
         if (num==0) {
-
             if (items.size() != 0){
-                Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
-                Bitmap albumArt = null;
-
-                try {
-                    albumArt = MediaStore.Images.Media.getBitmap(getContentResolver(), albumArtUri);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                binding.musicImage.setImageBitmap(albumArt);
-            }else{
-                binding.musicImage.setImageResource(R.drawable.ic_baseline_image_24);
-            }
+                setImgBitmap();
+            }else binding.musicImage.setImageResource(R.drawable.ic_baseline_image_24);
 
             binding.list.setVisibility(View.INVISIBLE);
             binding.musicImage.setVisibility(View.VISIBLE);
             getFragmentNum=0;
-
         }else{
             if (items.size() != 0){
-                Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
-                Bitmap albumArt = null;
-
-                try {
-                    albumArt = MediaStore.Images.Media.getBitmap(getContentResolver(), albumArtUri);
-                } catch (FileNotFoundException e) {
-                    e.printStackTrace();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                binding.musicImage.setImageBitmap(albumArt);
+                setImgBitmap();
             }else{
                 binding.musicImage.setImageResource(R.drawable.ic_baseline_image_24);
             }
-
             binding.list.setVisibility(View.VISIBLE);
             binding.musicImage.setVisibility(View.INVISIBLE);
             getFragmentNum=1;
-
         }
-
         getSupportFragmentManager()
                 .beginTransaction()
                 .replace(R.id.fragment_container, fragment, "position")
                 .commit();
     }
+    private void setImgBitmap(){
+        Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
+        Bitmap albumArt = null;
+
+        try {
+            albumArt = MediaStore.Images.Media.getBitmap(getContentResolver(), albumArtUri);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        binding.musicImage.setImageBitmap(albumArt);
+    }
 
     private void registerBroadcast() {
-
         IntentFilter filter = new IntentFilter();
         filter.addAction("PLAY");
         filter.addAction("PAUSE");
@@ -279,7 +261,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         filter.addAction("NEXT");
         registerReceiver(myBroadcast, filter);
     }
-
     @Override
     public void onBackPressed() {
         // 뒤로 가기 버튼 이벤트 처리
@@ -290,36 +271,20 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         startActivity(intent);
     }
 
-
-    @Override
-    protected void onNewIntent(Intent intent) {
-
-        //getDataFromService(intent);
-
-        super.onNewIntent(intent);
-    }
-
-
     // 음악 재생
     private void musicPlay(){
-
         if (musicService!=null){
             musicService.musicStart();
-
             binding.play.setVisibility(View.INVISIBLE);
             binding.pause.setVisibility(View.VISIBLE);
-
         }else{
-            Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
         }
     }
 
     // 음악 일시정지
     private void musicPause(){
-
         if (musicService!=null){
             musicService.musicPause();
-
             binding.play.setVisibility(View.VISIBLE);
             binding.pause.setVisibility(View.INVISIBLE);
         }
@@ -498,7 +463,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                     }
 
                 }else{
-                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
                 }
             }
         }else if (getFragmentNum==1){
@@ -513,7 +477,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                     }
 
                 }else{
-                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
                 }
             }
         }
@@ -535,7 +498,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                     }
 
                 }else{
-                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
                 }
             }
         }else if (getFragmentNum==1){
@@ -551,27 +513,10 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
                     }
 
                 }else{
-                    Toast.makeText(this, "플레이 할 음악을 선택해주세요", Toast.LENGTH_SHORT).show();
                 }
             }
         }
     }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-
-//        if (musicService!=null){
-//            if (connection != null) {
-//                unbindService(connection);
-//                connection = null;
-//            }else{
-//                Log.d("MainActivity onDestroy" , "ServiceConnection is not registered");
-//            }
-//        }
-
-    }
-
 }
 
 

@@ -50,11 +50,7 @@ public class MusicListFragment extends Fragment {
         args.putString(ARG_PARAM1, param1);
         args.putInt(ARG_PARAM2, param2);
         fragment.setArguments(args);
-
         return fragment;
-    }
-
-    public MusicListFragment() {
     }
 
     @Override
@@ -65,25 +61,19 @@ public class MusicListFragment extends Fragment {
             mParam2 = getArguments().getInt(ARG_PARAM2);
         }
     }
-
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         binding= FragmentMusicListBinding.inflate(inflater, container, false);
-
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
         adapter= new RecyclerMusicListAdapter(getActivity(), items);
         binding.recycler.setAdapter(adapter);
         binding.recycler.addItemDecoration(new DividerItemDecoration(requireActivity(), LinearLayout.VERTICAL));
-
-        Log.i("MusicListFragment onViewCreated", "MusicListFragment onViewCreated : " + mParam1+", "+mParam2);
-
         getMusic();
         clickedItems();
     }

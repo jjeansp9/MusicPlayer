@@ -30,16 +30,11 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public MediaPlayer mp= new MediaPlayer();
     private NotificationMediaStyle notificationMediaStyle;
-
-    private ArrayList<MediaFile> items= new ArrayList<>();
     private MediaFile mediaFile= new MediaFile("", "", "", "", R.drawable.ic_baseline_image_24);
-
     private boolean isPrepared = false;
     private Handler mHandler = new Handler();
-
     // Fragment로부터 전달받은 SeekBar를 저장하는 변수
     private SeekBar seekBar;
-
     private int currentDuration;
 
     private void updateProgress() {
@@ -63,20 +58,16 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     };
 
-
     @Override
     public void onCreate() {
         //서비스에서 가장 먼저 호출(최초한번)
-        //mp.setLooping(false); // 반복재생
         notificationMediaStyle= new NotificationMediaStyle();
-
         Log.d("Service onCreate", "onCreate");
         super.onCreate();
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
-
         if (intent == null){
             MusicStop();
             return START_NOT_STICKY;
@@ -129,12 +120,10 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
                     }
                 }
             }).start();
-
             playingMusic();
         }
 
         Log.d("Service onStartCommand", "onStartCommand : ");
-
         return START_STICKY;
     }
 
@@ -150,24 +139,13 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     @Override
     public void onDestroy() {
         super.onDestroy();
-        //서비스가 종료될 때 실행
-        mp.stop(); //음악 종료
-
-        // 강제종료시 다시 서비스 시작
-        Intent intent = new Intent(getApplicationContext(), MusicService.class);
-        PendingIntent pendingIntent = PendingIntent.getService(getApplicationContext(), 1, intent, 0);
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        alarmManager.set(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + 1000, pendingIntent);
-
         Log.d("Service onDestroy", "onDestroy");
-
     }
 
     // bindService()를 실행할 때 자동 발동하는 메소드
     @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-
         return new MyBinder();
     }
 
@@ -209,7 +187,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }).start();
 
         playingMusic();
-
         sendBroadcast(new Intent("PLAY"));
         notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), mediaFile.getUri(), 0);
         return "Start";
@@ -217,10 +194,8 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     public String musicPause(){
         mp.pause();
-
         sendBroadcast(new Intent("PAUSE"));
         notificationMediaStyle.craeteNotification(this, mediaFile.getArtist(), mediaFile.getTitle(), mediaFile.getUri(), 1);
-
         return "Pause";
     }
 
@@ -231,7 +206,6 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
             notificationMediaStyle=null;
         }
     }
-
 }
 
 

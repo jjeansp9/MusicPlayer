@@ -39,9 +39,7 @@ import kr.co.musicplayer.model.OnDataPass;
 public class MusicInfoFragment extends Fragment {
 
     private FragmentMusicInfoBinding binding;
-
     protected MusicService musicService;
-
     private OnDataPass dataPass;
 
     private static final String ARG_PARAM1 = "param1";
@@ -64,11 +62,8 @@ public class MusicInfoFragment extends Fragment {
             int progress = intent.getIntExtra("progress", 0);
             Log.i("Progresss", progress+"");
             binding.seekBar.setProgress(progress);
-
         }
     };
-
-
 
     public static MusicInfoFragment newInstance(String param1, String param2, String param3, int param4, ArrayList<MediaFile> items, int position) {
         MusicInfoFragment fragment = new MusicInfoFragment();
@@ -80,7 +75,6 @@ public class MusicInfoFragment extends Fragment {
         args.putParcelableArrayList(ARG_PARAM7, items);
         args.putInt(ARG_PARAM8, position);
         fragment.setArguments(args);
-
         return fragment;
     }
 
@@ -108,9 +102,6 @@ public class MusicInfoFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-
-        Log.i("MusicInfoFragment onViewCreated", "MusicInfoFragment onViewCreated : " + mParam1+", "+mParam2 + ", " + items.size());
-
         Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + items.get(position).getUri());
         Bitmap albumArt = null;
 
@@ -123,7 +114,6 @@ public class MusicInfoFragment extends Fragment {
         }
 
         binding.musicImage.setImageBitmap(albumArt);
-
         binding.musicComposer.setText(mParam2);
         binding.musicTitle.setText(mParam3);
 
@@ -132,30 +122,20 @@ public class MusicInfoFragment extends Fragment {
         String strTime = String.format("%01d:%02d", m, s);
 
         binding.playTimeMax.setText(strTime);
-
         seekBar();
-
     }
 
     @Override
     public void onResume() {
         super.onResume();
-
         IntentFilter filter = new IntentFilter("MEDIA_PLAYER_PROGRESS");
         filter.addAction("UPDATE_PROGRESS");
         getActivity().registerReceiver(broadcastReceiver, filter);
     }
 
     @Override
-    public void onPause() {
-        super.onPause();
-        getActivity().unregisterReceiver(broadcastReceiver);
-    }
-
-    @Override
     public void onAttach(@NonNull Context context) {
         super.onAttach(context);
-
         dataPass= (OnDataPass) context;
 
         // Service와 바인딩하여 Service 객체 가져오기
@@ -190,13 +170,9 @@ public class MusicInfoFragment extends Fragment {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
         binding.musicImage.setImageBitmap(albumArt);
-
         binding.musicComposer.setText(items.get(position).getArtist());
         binding.musicTitle.setText(items.get(position).getTitle());
-
         binding.playTimeMax.setText(items.get(position).getDuration());
     }
 
@@ -204,7 +180,6 @@ public class MusicInfoFragment extends Fragment {
     public void passData(MediaFile item, int position){
         dataPass.onDataPass(item, position, items.size(), items);
     }
-
 
     private void seekBar(){
 
@@ -222,27 +197,19 @@ public class MusicInfoFragment extends Fragment {
                     Intent intent = new Intent("MEDIA_PLAYER_SEEK");
                     intent.putExtra("progress", progress);
                     getActivity().sendBroadcast(intent);
-
                     musicService.mp.seekTo(progress);
                 }
-
             }
-
             @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
+            public void onStartTrackingTouch(SeekBar seekBar) {}
             @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-
+            public void onStopTrackingTouch(SeekBar seekBar) {}
         });
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-
         if (serviceConnection != null) {
             getActivity().unbindService(serviceConnection);
         }

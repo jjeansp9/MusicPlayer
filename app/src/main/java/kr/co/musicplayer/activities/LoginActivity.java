@@ -53,7 +53,6 @@ public class LoginActivity extends AppCompatActivity {
     private NidOAuthLogin nidOAuthLogin= new NidOAuthLogin();
 
     private UserApi userApi= ApiFactory.INSTANCE.getKapi().create(UserApi.class);
-
     GoogleSignInClient mGoogleSignInClient;
     private int RC_SIGN_IN = 10;
 
@@ -63,15 +62,12 @@ public class LoginActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-
         String[] loadUserInfo= users.loadUserId(this);
-
         // 디바이스에 저장된 ID값이 있다면 로그인화면을 생략하고 메인화면으로 이동
         if (loadUserInfo[0] != null){
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
         }
-
         binding= ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
@@ -85,7 +81,6 @@ public class LoginActivity extends AppCompatActivity {
         binding.kakaoLogin.setOnClickListener(v -> kakaoLogin()); // 카카오 로그인 버튼
         binding.naverLogin.setOnClickListener(v -> naverLogin()); // 네이버 로그인 버튼
         binding.googleLogin.setOnClickListener(v -> googleLogin()); // 구글 로그인 버튼
-
         request();
     }
 
@@ -93,35 +88,28 @@ public class LoginActivity extends AppCompatActivity {
 
     // 카카오 로그인
     private void kakaoLogin(){
-
         // 카카오계정으로 로그인 공통 callback 구성
         Function2<OAuthToken, Throwable, Unit> callback= (oAuthToken, throwable) -> {
-
             if (throwable != null){
                 Toast.makeText(LoginActivity.this, "카카오 로그인 실패", Toast.LENGTH_SHORT).show();
             }else{
                 kakaoUserInfo();
-
                 Log.d("kakaoToken", oAuthToken.getAccessToken());
             }
             return null;
         };
-
         // 카카오톡이 휴대폰에 설치 되어있으면 카톡으로 바로 접근해서 로그인 [ 권장 ]
         if (UserApiClient.getInstance().isKakaoTalkLoginAvailable(this)){
             UserApiClient.getInstance().loginWithKakaoTalk(this, callback);
-
         }else{ // 설치되어 있지 않은 경우 카카오 사이트로 접속해서 로그인
             UserApiClient.getInstance().loginWithKakaoAccount(this, callback);
         }
     }
-
     // 카카오 회원 정보
     private void kakaoUserInfo(){
         UserApiClient.getInstance().me(new Function2<com.kakao.sdk.user.model.User, Throwable, Unit>() {
             @Override
             public Unit invoke(com.kakao.sdk.user.model.User user, Throwable throwable) {
-
                 if (user != null) {
                     Log.i("kakaoLogin", "카카오 고유ID : " + user.getId());
                     Log.i("kakaoLogin", "카카오 닉네임 : " + user.getKakaoAccount().getProfile().getNickname());
@@ -131,13 +119,10 @@ public class LoginActivity extends AppCompatActivity {
                     Log.i("kakaoLogin", "카카오 프로필사진 : " + user.getKakaoAccount().getProfile().getProfileImageUrl());
 
                     users.saveUserId(LoginActivity.this, Double.toString(user.getId()), "kakao");
-
                     startActivity(new Intent(LoginActivity.this, MainActivity.class));
                     finish();
-
                     Toast.makeText(LoginActivity.this, "카카오 로그인 성공", Toast.LENGTH_SHORT).show();
                 }
-
                 return null;
             }
         });
@@ -156,13 +141,8 @@ public class LoginActivity extends AppCompatActivity {
     }
     private Unit callback(AccessTokenInfo tokenInfo, Throwable error){return null;}
 
-
     // 네이버 로그인
-    private void naverLogin(){
-        NaverIdLoginSDK.INSTANCE.authenticate(this, launcher);
-
-    }
-
+    private void naverLogin(){NaverIdLoginSDK.INSTANCE.authenticate(this, launcher);}
     private ActivityResultLauncher<Intent> launcher= registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
         @Override
         public void onActivityResult(ActivityResult result) {
@@ -177,23 +157,16 @@ public class LoginActivity extends AppCompatActivity {
                     nidOAuthLogin.callProfileApi(new NidProfileCallback<NidProfileResponse>() {
                         @Override
                         public void onSuccess(NidProfileResponse nidProfileResponse) {
-
                             naverInfo();
                         }
-
                         @Override
-                        public void onFailure(int i, @NonNull String s) {
-                        }
-
+                        public void onFailure(int i, @NonNull String s) {}
                         @Override
-                        public void onError(int i, @NonNull String s) {
-                        }
+                        public void onError(int i, @NonNull String s) {}
                     });
-
                 }
                 case RESULT_CANCELED:{
                     Log.e("naverError", "에러 : " + NaverIdLoginSDK.INSTANCE.getLastErrorCode().getCode() +", "+ NaverIdLoginSDK.INSTANCE.getLastErrorDescription());
-
                 }
             }
         }
@@ -201,11 +174,9 @@ public class LoginActivity extends AppCompatActivity {
 
     // 네이버 회원정보
     private void naverInfo(){
-
         nidOAuthLogin.callProfileApi(new NidProfileCallback<NidProfileResponse>() {
             @Override
             public void onSuccess(NidProfileResponse nidProfileResponse) {
-
                 Log.i("naverInfo", "네이버 ID : " + nidProfileResponse.getProfile().getId());
                 Log.i("naverInfo", "네이버 닉네임 : " + nidProfileResponse.getProfile().getNickname());
                 Log.i("naverInfo", "네이버 프로필이미지 : " + nidProfileResponse.getProfile().getProfileImage());
@@ -241,15 +212,12 @@ public class LoginActivity extends AppCompatActivity {
                 .build();
 
         mGoogleSignInClient= GoogleSignIn.getClient(this, gso);
-
         Intent signInIntent= mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
     }
-
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == RC_SIGN_IN){
             Task<GoogleSignInAccount> task= GoogleSignIn.getSignedInAccountFromIntent(data);
             handleSignInResult(task);
@@ -259,7 +227,6 @@ public class LoginActivity extends AppCompatActivity {
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {
             GoogleSignInAccount account = completedTask.getResult(ApiException.class);
-
             Log.i("googleID", account.getId());
             Log.i("googleAccount", account.getAccount()+"");
             Log.i("googleEmail", account.getEmail());
@@ -270,12 +237,9 @@ public class LoginActivity extends AppCompatActivity {
 //            Log.i("googleLogin", account.getIdToken());
 
             users.saveUserId(this, account.getId(), "google");
-
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
-
             Toast.makeText(LoginActivity.this, "구글 로그인 완료", Toast.LENGTH_SHORT).show();
-
             // Signed in successfully, show authenticated UI.
             //updateUI(account);
         } catch (ApiException e) {

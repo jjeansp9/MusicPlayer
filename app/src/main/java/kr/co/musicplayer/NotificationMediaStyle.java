@@ -28,7 +28,6 @@ import kr.co.musicplayer.activities.MainActivity;
 import kr.co.musicplayer.model.MediaFile;
 
 public class NotificationMediaStyle {
-
     NotificationCompat.Builder builder= null;
     NotificationManager notificationManager;
     NotificationChannel channel;
@@ -40,11 +39,7 @@ public class NotificationMediaStyle {
 
     protected void craeteNotification(Context context, String artist, String title, long uri, int num){
 
-        // 운영체제로부터 알림(Notification)을 관리하는 관리자 객체 소환
         notificationManager= (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        // Notification 객체를 생성해주는 Builder 객체 생성
-
-        Log.e("getSystem", context.getSystemService(Context.NOTIFICATION_SERVICE)+"");
 
         if(Build.VERSION.SDK_INT > Build.VERSION_CODES.O){ // 디바이스 버전이 26버전(Oreo버전) 이상이라면
 
@@ -52,43 +47,28 @@ public class NotificationMediaStyle {
             channel= new NotificationChannel("ch1", "My channel", NotificationManager.IMPORTANCE_LOW);
             channel.setShowBadge(false);
 
-            // 알림매니저에게 위 알림채널객체를 시스템에서 인식하도록 생성
             notificationManager.createNotificationChannel(channel);
-
             builder= new NotificationCompat.Builder(context, "ch1");
         }else{ // 디바이스버전이 26버전 이상이 아니라면
             builder= new NotificationCompat.Builder(context, "");
         }
-
-        // 알림창을 클릭했을 때 실행될 작업( 새로운 화면[SecondActivity] ) 실행 설정
-        Intent intent= new Intent(context, MainActivity.class);
-
-        PendingIntent pendingIntent= PendingIntent.getActivity(context, 100, intent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
-        builder.setContentIntent(pendingIntent);
-
         Intent prevIntent = new Intent(context, MusicService.class);
         prevIntent.setAction(ACTION_PREVIOUS);
-        //prevIntent.putExtra("music", "previous");
 
         Intent playIntent = new Intent(context, MusicService.class);
         playIntent.setAction(ACTION_PLAY);
-        //playIntent.putExtra("music", "play");
 
         Intent pauseIntent = new Intent(context, MusicService.class);
         pauseIntent.setAction(ACTION_PAUSE);
-        //pauseIntent.putExtra("music", "pause");
 
         Intent nextIntent = new Intent(context, MusicService.class);
         nextIntent.setAction(ACTION_NEXT);
-        //nextIntent.putExtra("music", "next");
 
         // 이전, 재생/일시정지, 다음 액션 PendingIntent 생성
         PendingIntent prevPendingIntent = PendingIntent.getService(context, 0, prevIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         PendingIntent playPendingIntent = PendingIntent.getService(context, 0, playIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         PendingIntent pausePendingIntent = PendingIntent.getService(context, 0, pauseIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
         PendingIntent nextPendingIntent = PendingIntent.getService(context, 0, nextIntent, PendingIntent.FLAG_UPDATE_CURRENT|PendingIntent.FLAG_IMMUTABLE);
-
-        //Bitmap bm= BitmapFactory.decodeResource(getResources(), R.drawable.newyork);
 
         Uri albumArtUri = Uri.parse("content://media/external/audio/albumart/" + uri);
         Bitmap albumArt = null;

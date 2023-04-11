@@ -47,7 +47,6 @@ public class MyBroadcast extends BroadcastReceiver {
                 mainActivity.playNextMusic();
             }
         }
-
     }
 }
 
