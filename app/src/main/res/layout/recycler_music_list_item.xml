@@ -16,19 +16,23 @@
 
     <TextView
         android:id="@+id/title"
-        android:layout_width="wrap_content"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:layout_toRightOf="@+id/img"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="음악 제목"
-        android:textSize="14sp"
-        android:textColor="@color/black"/>
+        android:textColor="@color/black"
+        android:textSize="14sp" />
 
     <TextView
         android:id="@+id/composer"
-        android:layout_width="wrap_content"
+        android:layout_width="220dp"
         android:layout_height="wrap_content"
         android:text="작곡가"
         android:layout_toRightOf="@+id/img"
+        android:maxLines="1"
+        android:ellipsize="end"
         android:layout_alignParentBottom="true"
         android:textColor="@color/black"
         android:textStyle="bold"/>

@@ -85,10 +85,5 @@ public class RecyclerMusicListAdapter extends RecyclerView.Adapter<RecyclerMusic
 
             binding= RecyclerMusicListItemBinding.bind(itemView);
         }
-
-
-
-
-
     }
 }
