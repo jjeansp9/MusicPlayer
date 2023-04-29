@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         String[] loadUserInfo= users.loadUserId(this);
-        // 디바이스에 저장된 ID값이 있다면 로그인화면을 생략하고 메인화면으로 이동
+        // 디바이스에 저장된 ID값이 있다면 로그인화면을 생략하고 메인화면으로 이동.
         if (loadUserInfo[0] != null){
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
