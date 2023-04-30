@@ -88,6 +88,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         setContentView(binding.getRoot());
 
 
+
         getUserData(loadUserInfo);
 
         myBroadcast= new MyBroadcast();
@@ -123,9 +124,10 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         
         // 사이드바가 열린 상태에서 바깥 영역 클릭시 사이드바 닫기
         binding.mainRoot.setOnClickListener(v -> {
-            if (drawerLayout.isDrawerOpen(GravityCompat.START)){
-                drawerLayout.closeDrawer(GravityCompat.START);
-            }
+//            if (drawerLayout.isDrawerOpen(GravityCompat.START)){
+//                drawerLayout.closeDrawer(GravityCompat.START);
+//            }
+            Log.i("click", "click");
         });
 
         binding.play.setOnClickListener(v -> musicPlay()); // 음악 재생
@@ -366,7 +368,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     }
 
     private void unLinkUser(String[] loadUserInfo){
-
 
         if (loadUserInfo[1].equals("kakao")){ // 카카오 탈퇴
             UserApiClient.getInstance().unlink(new Function1<Throwable, Unit>() {

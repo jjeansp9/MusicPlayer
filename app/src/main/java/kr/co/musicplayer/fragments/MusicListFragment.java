@@ -74,7 +74,7 @@ public class MusicListFragment extends Fragment {
         adapter= new RecyclerMusicListAdapter(getActivity(), items);
         binding.recycler.setAdapter(adapter);
         binding.recycler.addItemDecoration(new DividerItemDecoration(requireActivity(), LinearLayout.VERTICAL));
-        getMusic();
+        //getMusic();
         clickedItems();
     }
 
