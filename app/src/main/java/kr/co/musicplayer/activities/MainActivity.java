@@ -265,7 +265,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
     }
     @Override
     public void onBackPressed() {
-        // 뒤로 가기 버튼 이벤트 처리.
+        // 뒤로 가기 버튼 이벤트 처리
         // 홈 버튼 기능 수행
         Intent intent = new Intent(Intent.ACTION_MAIN);
         intent.addCategory(Intent.CATEGORY_HOME);
