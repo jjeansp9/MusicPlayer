@@ -47,7 +47,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
         }
     }
 
-    // MediaPlayer의 재생 시간이 변경될 때마다 호출되는 Runnable 객체
+    // MediaPlayer의 재생 시간이 변경될 때마다 호출되는 Runnable 객체.
     private Runnable mUpdateTimeTask = new Runnable() {
         public void run() {
             if (mp != null && isPrepared) {
