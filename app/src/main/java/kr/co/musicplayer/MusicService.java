@@ -33,7 +33,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
     private MediaFile mediaFile= new MediaFile("", "", "", "", R.drawable.ic_baseline_image_24);
     private boolean isPrepared = false;
     private Handler mHandler = new Handler();
-    // Fragment로부터 전달받은 SeekBar를 저장하는 변수.
+    // Fragment로부터 전달받은 SeekBar를 저장하는 변수
     private SeekBar seekBar;
     private int currentDuration;
 
