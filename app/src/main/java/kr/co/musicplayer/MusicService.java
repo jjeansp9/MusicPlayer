@@ -60,7 +60,7 @@ public class MusicService extends Service implements MediaPlayer.OnPreparedListe
 
     @Override
     public void onCreate() {
-        //서비스에서 가장 먼저 호출(최초한번)
+        //서비스에서 가장 먼저 호출(최초한번).
         notificationMediaStyle= new NotificationMediaStyle();
         Log.d("Service onCreate", "onCreate");
         super.onCreate();
