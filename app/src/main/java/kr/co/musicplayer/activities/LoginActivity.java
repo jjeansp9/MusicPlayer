@@ -63,7 +63,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         String[] loadUserInfo= users.loadUserId(this);
-        // 디바이스에 저장된 ID값이 있다면 로그인화면을 생략하고 메인화면으로 이동.
+        // 디바이스에 저장된 ID값이 있다면 로그인화면을 생략하고 메인화면으로 이동
         if (loadUserInfo[0] != null){
             startActivity(new Intent(LoginActivity.this, MainActivity.class));
             finish();
@@ -213,7 +213,8 @@ public class LoginActivity extends AppCompatActivity {
 
         mGoogleSignInClient= GoogleSignIn.getClient(this, gso);
         Intent signInIntent= mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
+        //startActivityForResult(signInIntent, RC_SIGN_IN);
+        resultLauncher.launch(signInIntent);
     }
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
@@ -223,6 +224,19 @@ public class LoginActivity extends AppCompatActivity {
             handleSignInResult(task);
         }
     }
+
+
+    ActivityResultLauncher<Intent> resultLauncher = registerForActivityResult(new ActivityResultContracts.StartActivityForResult(), new ActivityResultCallback<ActivityResult>() {
+        @Override
+        public void onActivityResult(ActivityResult result) {
+            if (result.getResultCode() == RESULT_OK) {
+                Intent data = result.getData();
+                Task<GoogleSignInAccount> task = GoogleSignIn.getSignedInAccountFromIntent(data);
+                handleSignInResult(task);
+            }else{
+            }
+        }
+    });
 
     private void handleSignInResult(Task<GoogleSignInAccount> completedTask) {
         try {

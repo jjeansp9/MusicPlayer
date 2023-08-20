@@ -375,7 +375,7 @@ public class LoginTestActivity extends AppCompatActivity {
         Log.i("tokenTime", NaverIdLoginSDK.INSTANCE.getExpiresAt()+"");
     }
 
-    // 네이버 회원탈퇴
+    // 네이버 회원탈퇴.
     private void naverUnlink(){
 
         nidOAuthLogin.callDeleteTokenApi(this, new OAuthLoginCallback() {
