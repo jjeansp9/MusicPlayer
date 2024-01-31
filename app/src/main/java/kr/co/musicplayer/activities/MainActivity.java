@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     private ActivityMainBinding binding;
 
-    private TextView userName, userEmail;
+    private TextView userName, userEmail, tvSecond;
     private ImageView userImage;
 
     private MediaFile mMediaFile= new MediaFile("","","","", R.drawable.ic_baseline_image_24);
