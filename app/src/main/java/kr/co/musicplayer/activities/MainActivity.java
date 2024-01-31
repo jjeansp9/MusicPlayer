@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
     private ActivityMainBinding binding;
 
-    private TextView userName, userEmail, tvSecond;
+    private TextView userName, userEmail;
     private ImageView userImage;
 
     private MediaFile mMediaFile= new MediaFile("","","","", R.drawable.ic_baseline_image_24);
@@ -102,7 +102,6 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
 
         findViewById(R.id.un_link).setOnClickListener(v -> unLinkUser(loadUserInfo)); // 회원탈퇴 버튼
 
-
         // 음악리스트 화면으로 이동
         binding.list.setOnClickListener(v-> showFragment(MusicListFragment.newInstance("position", 20), 0, position));
 
@@ -131,6 +130,8 @@ public class MainActivity extends AppCompatActivity implements OnDataPass {
         binding.pause.setOnClickListener(v -> musicPause()); // 음악 일시정지
         binding.playPrevious.setOnClickListener(v -> playPreviousMusic()); // 이전 음악 플레이
         binding.playNext.setOnClickListener(v -> playNextMusic()); // 다음 음악 플레이
+
+        binding.tvSecond.setOnClickListener(v -> startActivity(new Intent(this, SecondActivity.class)));
 
         registerBroadcast();
 
