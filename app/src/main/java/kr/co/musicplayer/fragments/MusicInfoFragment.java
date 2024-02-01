@@ -24,6 +24,7 @@ import android.widget.SeekBar;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import java.io.FileNotFoundException;
@@ -130,7 +131,7 @@ public class MusicInfoFragment extends Fragment {
         super.onResume();
         IntentFilter filter = new IntentFilter("MEDIA_PLAYER_PROGRESS");
         filter.addAction("UPDATE_PROGRESS");
-        getActivity().registerReceiver(broadcastReceiver, filter);
+        requireActivity().registerReceiver(broadcastReceiver, filter);
     }
 
     @Override
@@ -139,8 +140,8 @@ public class MusicInfoFragment extends Fragment {
         dataPass= (OnDataPass) context;
 
         // Service와 바인딩하여 Service 객체 가져오기
-        Intent intent = new Intent(getActivity(), MusicService.class);
-        getActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
+        Intent intent = new Intent(requireActivity(), MusicService.class);
+        requireActivity().bindService(intent, serviceConnection, Context.BIND_AUTO_CREATE);
     }
 
     private ServiceConnection serviceConnection = new ServiceConnection() {

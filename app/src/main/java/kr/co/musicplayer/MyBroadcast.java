@@ -28,14 +28,11 @@ public class MyBroadcast extends BroadcastReceiver {
 
         if (intent.getAction()!= null){
             if (intent.getAction().equals("PLAY")){
-
-
                 // View 조작하기
                 mainActivity.findViewById(R.id.play).setVisibility(View.INVISIBLE);
                 mainActivity.findViewById(R.id.pause).setVisibility(View.VISIBLE);
 
             }else if (intent.getAction().equals("PAUSE")){
-
                 // View 조작하기
                 mainActivity.findViewById(R.id.play).setVisibility(View.VISIBLE);
                 mainActivity.findViewById(R.id.pause).setVisibility(View.INVISIBLE);
