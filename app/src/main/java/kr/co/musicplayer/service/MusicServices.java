@@ -34,7 +34,7 @@ public class MusicServices extends Service implements MediaPlayer.OnPreparedList
     private static final String TAG = "MusicService";
 
     public MediaPlayer mp= new MediaPlayer();
-    private NotificationMediaStyle notificationMediaStyle;
+    //private NotificationMediaStyle notificationMediaStyle;
 
     public Messenger mMessenger = new Messenger(new Handler(Looper.getMainLooper()) {
         @Override
